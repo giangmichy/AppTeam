@@ -17,8 +17,46 @@ import { Ionicons } from '@expo/vector-icons';
 import { LinearGradient } from 'expo-linear-gradient';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
-import { COLORS } from '../constants/colors';
-import { RootStackParamList } from '../navigation/AppNavigator';
+
+// COLORS constant
+const COLORS = {
+  primary: '#6366F1',
+  primaryLight: '#818CF8',
+  primaryDark: '#4F46E5',
+  secondary: '#8B5CF6',
+  accent: '#A855F7',
+  gradientStart: '#667EEA',
+  gradientEnd: '#764BA2',
+  success: '#10B981',
+  danger: '#EF4444',
+  warning: '#F59E0B',
+  info: '#3B82F6',
+  background: '#F8FAFC',
+  surface: '#FFFFFF',
+  text: '#1E293B',
+  textSecondary: '#64748B',
+  textLight: '#94A3B8',
+  border: '#E2E8F0',
+  inputBackground: '#F1F5F9',
+  gray50: '#F8FAFC',
+  gray100: '#F1F5F9',
+  gray200: '#E2E8F0',
+  gray300: '#CBD5E1',
+  gray400: '#94A3B8',
+  gray500: '#64748B',
+  gray600: '#475569',
+  gray700: '#334155',
+  gray800: '#1E293B',
+  gray900: '#0F172A',
+  white: '#FFFFFF',
+  black: '#000000',
+};
+
+export type RootStackParamList = {
+  Home: undefined;
+  Login: undefined;
+  Register: undefined;
+};
 
 const { height } = Dimensions.get('window');
 
@@ -107,22 +145,21 @@ const RegisterScreen = () => {
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
     >
       <StatusBar barStyle="light-content" backgroundColor={COLORS.primary} />
-      {/* Header with Gradient */}
+      
+      {/* Compact Header with Gradient - No duplicate back arrow */}
       <LinearGradient
         colors={[COLORS.gradientStart, COLORS.gradientEnd]}
         style={styles.header}
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
-        <TouchableOpacity style={styles.backButton} onPress={goBack}>
-          <Ionicons name="arrow-back" size={20} color={COLORS.white} />
-        </TouchableOpacity>
         <View style={styles.logoContainer}>
-          <Ionicons name="person-add-outline" size={32} color={COLORS.white} />
+          <Ionicons name="person-add-outline" size={28} color={COLORS.white} />
         </View>
-        <Text style={styles.title}>Tạo tài khoản mới</Text>
+        <Text style={styles.welcomeText}>Tạo tài khoản mới</Text>
         <Text style={styles.subtitle}>Tham gia cộng đồng học tập</Text>
       </LinearGradient>
+      
       {/* Form */}
       <ScrollView
         contentContainerStyle={styles.scrollContainer}
@@ -165,6 +202,7 @@ const RegisterScreen = () => {
             leftIcon="lock-closed-outline"
             error={errors.confirmPassword}
           />
+          
           {/* Terms and Conditions */}
           <TouchableOpacity 
             style={styles.termsContainer}
@@ -172,7 +210,7 @@ const RegisterScreen = () => {
           >
             <View style={[styles.checkbox, agreeToTerms && styles.checkboxChecked]}>
               {agreeToTerms && (
-                <Ionicons name="checkmark" size={13} color={COLORS.white} />
+                <Ionicons name="checkmark" size={14} color={COLORS.white} />
               )}
             </View>
             <Text style={styles.termsText}>
@@ -185,18 +223,21 @@ const RegisterScreen = () => {
           {errors.terms && (
             <Text style={styles.errorText}>{errors.terms}</Text>
           )}
+          
           <CustomButton
             title="Đăng ký"
             onPress={handleRegister}
             loading={loading}
             style={styles.registerButton}
           />
+          
           {/* Divider */}
           <View style={styles.dividerContainer}>
             <View style={styles.divider} />
             <Text style={styles.dividerText}>hoặc</Text>
             <View style={styles.divider} />
           </View>
+          
           {/* Google Register */}
           <CustomButton
             title="Đăng ký với Google"
@@ -208,6 +249,7 @@ const RegisterScreen = () => {
             }
             textStyle={{fontWeight: '700', color: COLORS.primary}}
           />
+          
           {/* Footer */}
           <View style={styles.footer}>
             <Text style={styles.footerText}>Đã có tài khoản? </Text>
@@ -231,64 +273,59 @@ const styles = StyleSheet.create({
     justifyContent: 'flex-start',
   },
   header: {
-    paddingTop: 20,
-    paddingBottom: 8,
-    paddingHorizontal: 10,
+    paddingTop: 40,
+    paddingBottom: 20,
+    paddingHorizontal: 20,
     alignItems: 'center',
-    borderBottomLeftRadius: 14,
-    borderBottomRightRadius: 14,
-    position: 'relative',
-    height: height * 0.15,
+    borderBottomLeftRadius: 16,
+    borderBottomRightRadius: 16,
+    minHeight: height * 0.18,
     justifyContent: 'center',
   },
-  backButton: {
-    position: 'absolute',
-    left: 10,
-    top: 20,
-    zIndex: 1,
-  },
+  // Remove unused backButton style
+  // backButton: { ... },
   logoContainer: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
+    width: 56,
+    height: 56,
+    borderRadius: 28,
     backgroundColor: 'rgba(255, 255, 255, 0.2)',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 6,
+    marginBottom: 12,
   },
-  title: {
-    fontSize: 16,
+  welcomeText: {
+    fontSize: 20,
     fontWeight: 'bold',
     color: COLORS.white,
-    marginBottom: 2,
+    marginBottom: 6,
     textAlign: 'center',
   },
   subtitle: {
-    fontSize: 11,
+    fontSize: 14,
     color: 'rgba(255, 255, 255, 0.9)',
     textAlign: 'center',
   },
   formContainer: {
     flex: 1,
-    paddingHorizontal: 10,
-    paddingTop: 10,
+    paddingHorizontal: 20,
+    paddingTop: 24,
   },
   termsContainer: {
     flexDirection: 'row',
     alignItems: 'flex-start',
-    marginBottom: 4,
-    paddingHorizontal: 2,
+    marginBottom: 8,
+    paddingHorizontal: 4,
   },
   checkbox: {
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 22,
     borderWidth: 2,
     borderColor: COLORS.border,
-    borderRadius: 5,
+    borderRadius: 6,
     alignItems: 'center',
     justifyContent: 'center',
-    marginRight: 9,
-    marginTop: 4,
+    marginRight: 12,
+    marginTop: 2,
   },
   checkboxChecked: {
     backgroundColor: COLORS.primary,
@@ -296,30 +333,30 @@ const styles = StyleSheet.create({
   },
   termsText: {
     flex: 1,
-    fontSize: 12,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    lineHeight: 25,
-    fontWeight: '600',
+    lineHeight: 20,
+    fontWeight: '500',
   },
   termsLink: {
     color: COLORS.primary,
     fontWeight: '600',
   },
   errorText: {
-    fontSize: 11,
+    fontSize: 12,
     color: COLORS.danger,
-    marginBottom: 6,
-    marginLeft: 2,
+    marginBottom: 12,
+    marginLeft: 4,
     fontWeight: '500',
   },
   registerButton: {
-    marginTop: 5,
-    marginBottom: 8,
+    marginTop: 8,
+    marginBottom: 16,
   },
   dividerContainer: {
     flexDirection: 'row',
     alignItems: 'center',
-    marginVertical: 8,
+    marginVertical: 16,
   },
   divider: {
     flex: 1,
@@ -327,27 +364,50 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.border,
   },
   dividerText: {
-    fontSize: 13,
+    fontSize: 14,
     color: COLORS.textSecondary,
-    marginHorizontal: 10,
-    fontWeight: '600',
+    marginHorizontal: 16,
+    fontWeight: '500',
   },
   googleButton: {
-    marginBottom: 8,
+    marginBottom: 16,
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
+  },
+  googleIconContainer: {
+    width: 20,
+    height: 20,
+    borderRadius: 10,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginRight: 8,
+    backgroundColor: COLORS.white,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.1,
+    shadowRadius: 2,
+    elevation: 2,
+  },
+  googleG: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: '#4285F4',
+    fontFamily: 'Roboto',
   },
   footer: {
     flexDirection: 'row',
     justifyContent: 'center',
-    paddingBottom: 6,
-    marginTop: 6,
+    paddingVertical: 20,
+    marginTop: 8,
   },
   footerText: {
-    fontSize: 13,
+    fontSize: 16,
     color: COLORS.textSecondary,
     fontWeight: '500',
   },
   footerLink: {
-    fontSize: 13,
+    fontSize: 16,
     color: COLORS.primary,
     fontWeight: '700',
   },
