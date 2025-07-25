@@ -204,7 +204,7 @@ const styles = StyleSheet.create({
   forgotPasswordText: {
     fontSize: 14,
     color: COLORS.primary,
-    fontWeight: '700',
+    fontWeight: '600',
   },
   loginButton: {
     marginBottom: 8,

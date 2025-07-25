@@ -330,7 +330,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     color: COLORS.textSecondary,
     marginHorizontal: 10,
-    fontWeight: '500',
+    fontWeight: '600',
   },
   googleButton: {
     marginBottom: 8,
