@@ -17,7 +17,16 @@ import { LinearGradient } from 'expo-linear-gradient';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
 import { COLORS } from '../constants/colors';
-import { RootStackParamList } from '../navigation/AppNavigator';
+
+// Updated RootStackParamList to include new screens
+export type RootStackParamList = {
+  Home: undefined;
+  Login: undefined;
+  Register: undefined;
+  ForgotPassword: undefined;
+  OTPVerification: { email: string };
+  ResetPassword: { email: string; otpCode: string };
+};
 
 const { height } = Dimensions.get('window');
 
@@ -77,6 +86,10 @@ const LoginScreen = () => {
     navigation.navigate('Register');
   };
 
+  const navigateToForgotPassword = () => {
+    navigation.navigate('ForgotPassword');
+  };
+
   return (
     <KeyboardAvoidingView 
       style={styles.container} 
@@ -90,6 +103,12 @@ const LoginScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
+        {/* Back button */}
+        {navigation.canGoBack && navigation.canGoBack() && (
+          <TouchableOpacity style={{ position: 'absolute', left: 12, top: 32, zIndex: 10 }} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
         <View style={styles.logoContainer}>
           <Ionicons name="school-outline" size={36} color={COLORS.white} />
         </View>
@@ -116,7 +135,10 @@ const LoginScreen = () => {
           leftIcon="lock-closed-outline"
           error={errors.password}
         />
-        <TouchableOpacity style={styles.forgotPassword}>
+        <TouchableOpacity 
+          style={styles.forgotPassword}
+          onPress={navigateToForgotPassword}
+        >
           <Text style={styles.forgotPasswordText}>Quên mật khẩu?</Text>
         </TouchableOpacity>
         <CustomButton
@@ -200,6 +222,7 @@ const styles = StyleSheet.create({
     alignSelf: 'flex-end',
     marginBottom: 8,
     marginTop: -4,
+    padding: 4,
   },
   forgotPasswordText: {
     fontSize: 14,

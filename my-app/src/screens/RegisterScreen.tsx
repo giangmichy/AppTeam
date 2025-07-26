@@ -153,8 +153,14 @@ const RegisterScreen = () => {
         start={{ x: 0, y: 0 }}
         end={{ x: 1, y: 1 }}
       >
+        {/* Back button */}
+        {navigation.canGoBack && navigation.canGoBack() && (
+          <TouchableOpacity style={{ position: 'absolute', left: 12, top: 32, zIndex: 10 }} onPress={() => navigation.goBack()}>
+            <Ionicons name="arrow-back" size={24} color={COLORS.white} />
+          </TouchableOpacity>
+        )}
         <View style={styles.logoContainer}>
-          <Ionicons name="person-add-outline" size={28} color={COLORS.white} />
+          <Ionicons name="person-add-outline" size={32} color={COLORS.white} />
         </View>
         <Text style={styles.welcomeText}>Tạo tài khoản mới</Text>
         <Text style={styles.subtitle}>Tham gia cộng đồng học tập</Text>
