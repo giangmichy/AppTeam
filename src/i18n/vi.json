@@ -1,0 +1,10 @@
+{
+  "hello": "Xin chào",
+  "login": "Đăng nhập",
+  "register": "Đăng ký",
+  "home": {
+    "learning": "Học tập",
+    "favorites": "Yêu thích",
+    "account": "Tài khoản"
+  }
+}

@@ -1,9 +1,15 @@
-import React from 'react';
-import { TouchableOpacity, Text, ViewStyle, TextStyle, ActivityIndicator } from 'react-native';
-import { COLORS } from '../constants/colors';
+import React from "react";
+import {
+  TouchableOpacity,
+  Text,
+  ViewStyle,
+  TextStyle,
+  ActivityIndicator,
+} from "react-native";
+import { COLORS } from "../constants/colors";
 
-type ButtonVariant = 'primary' | 'secondary' | 'outline';
-type ButtonSize = 'small' | 'medium' | 'large';
+type ButtonVariant = "primary" | "secondary" | "outline";
+type ButtonSize = "small" | "medium" | "large";
 
 type CustomButtonProps = {
   title: string;
@@ -20,8 +26,8 @@ type CustomButtonProps = {
 const CustomButton: React.FC<CustomButtonProps> = ({
   title,
   onPress,
-  variant = 'primary',
-  size = 'medium',
+  variant = "primary",
+  size = "medium",
   disabled = false,
   loading = false,
   style,
@@ -31,10 +37,10 @@ const CustomButton: React.FC<CustomButtonProps> = ({
   const getButtonStyle = (): ViewStyle => {
     const baseStyle: ViewStyle = {
       borderRadius: 8,
-      alignItems: 'center',
-      justifyContent: 'center',
-      flexDirection: 'row',
-      shadowColor: '#000',
+      alignItems: "center",
+      justifyContent: "center",
+      flexDirection: "row",
+      shadowColor: "#000",
       shadowOffset: { width: 0, height: 2 },
       shadowOpacity: 0.1,
       shadowRadius: 4,
@@ -57,7 +63,7 @@ const CustomButton: React.FC<CustomButtonProps> = ({
         backgroundColor: disabled ? COLORS.gray200 : COLORS.accent,
       },
       outline: {
-        backgroundColor: 'transparent',
+        backgroundColor: "transparent",
         borderWidth: 2,
         borderColor: disabled ? COLORS.gray300 : COLORS.primary,
       },
@@ -73,8 +79,8 @@ const CustomButton: React.FC<CustomButtonProps> = ({
 
   const getTextStyle = (): TextStyle => {
     const baseStyle: TextStyle = {
-      fontWeight: '600',
-      textAlign: 'center',
+      fontWeight: "600",
+      textAlign: "center",
     };
 
     // Size text styles
@@ -108,16 +114,18 @@ const CustomButton: React.FC<CustomButtonProps> = ({
       {loading && (
         <ActivityIndicator
           size="small"
-          color={variant === 'outline' ? COLORS.primary : COLORS.white}
+          color={variant === "outline" ? COLORS.primary : COLORS.white}
           style={{ marginRight: 8 }}
         />
       )}
       {icon && !loading && <>{icon}</>}
-      <Text style={[
-        getTextStyle(),
-        textStyle,
-        (icon && !loading) ? { marginLeft: 8 } : undefined
-      ]}>
+      <Text
+        style={[
+          getTextStyle(),
+          textStyle,
+          icon && !loading ? { marginLeft: 8 } : undefined,
+        ]}
+      >
         {title}
       </Text>
     </TouchableOpacity>

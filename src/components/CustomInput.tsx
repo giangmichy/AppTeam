@@ -1,7 +1,15 @@
-import React, { useState } from 'react';
-import { View, TextInput, Text, TouchableOpacity, ViewStyle, TextStyle, Animated } from 'react-native';
-import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../constants/colors';
+import React, { useState } from "react";
+import {
+  View,
+  TextInput,
+  Text,
+  TouchableOpacity,
+  ViewStyle,
+  TextStyle,
+  Animated,
+} from "react-native";
+import { Ionicons } from "@expo/vector-icons";
+import { COLORS } from "../constants/colors";
 
 type CustomInputProps = {
   label?: string;
@@ -9,7 +17,7 @@ type CustomInputProps = {
   onChangeText: (text: string) => void;
   placeholder?: string;
   secureTextEntry?: boolean;
-  keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad';
+  keyboardType?: "default" | "email-address" | "numeric" | "phone-pad";
   error?: string;
   leftIcon?: keyof typeof Ionicons.glyphMap;
   rightIcon?: keyof typeof Ionicons.glyphMap;
@@ -27,7 +35,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
   onChangeText,
   placeholder,
   secureTextEntry = false,
-  keyboardType = 'default',
+  keyboardType = "default",
   error,
   leftIcon,
   rightIcon,
@@ -70,16 +78,20 @@ const CustomInput: React.FC<CustomInputProps> = ({
   };
 
   const inputContainerStyle: ViewStyle = {
-    flexDirection: 'row',
-    alignItems: multiline ? 'flex-start' : 'center',
+    flexDirection: "row",
+    alignItems: multiline ? "flex-start" : "center",
     backgroundColor: COLORS.white,
     borderRadius: 12,
     borderWidth: 2,
-    borderColor: error ? COLORS.danger : isFocused ? COLORS.primary : COLORS.border,
+    borderColor: error
+      ? COLORS.danger
+      : isFocused
+      ? COLORS.primary
+      : COLORS.border,
     paddingHorizontal: 16,
     paddingVertical: multiline ? 12 : 0,
     minHeight: multiline ? undefined : 56,
-    shadowColor: error ? COLORS.danger : isFocused ? COLORS.primary : '#000',
+    shadowColor: error ? COLORS.danger : isFocused ? COLORS.primary : "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: isFocused ? 0.1 : 0.05,
     shadowRadius: isFocused ? 8 : 4,
@@ -88,7 +100,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
 
   const labelStyle: TextStyle = {
     fontSize: 14,
-    fontWeight: '600',
+    fontWeight: "600",
     color: COLORS.text,
     marginBottom: 8,
     marginLeft: 4,
@@ -99,8 +111,8 @@ const CustomInput: React.FC<CustomInputProps> = ({
     fontSize: 16,
     color: COLORS.text,
     paddingVertical: multiline ? 0 : 16,
-    textAlignVertical: multiline ? 'top' : 'center',
-    fontWeight: '500',
+    textAlignVertical: multiline ? "top" : "center",
+    fontWeight: "500",
     ...inputStyle,
   };
 
@@ -109,7 +121,7 @@ const CustomInput: React.FC<CustomInputProps> = ({
     color: COLORS.danger,
     marginTop: 6,
     marginLeft: 4,
-    fontWeight: '500',
+    fontWeight: "500",
   };
 
   const iconStyle = {
@@ -125,15 +137,23 @@ const CustomInput: React.FC<CustomInputProps> = ({
   return (
     <View style={containerStyle}>
       {label && <Text style={labelStyle}>{label}</Text>}
-      <Animated.View style={[
-        inputContainerStyle,
-        !error && { borderColor: animatedBorderColor }
-      ]}>
+      <Animated.View
+        style={[
+          inputContainerStyle,
+          !error && { borderColor: animatedBorderColor },
+        ]}
+      >
         {leftIcon && (
           <Ionicons
             name={leftIcon}
             size={22}
-            color={error ? COLORS.danger : isFocused ? COLORS.primary : COLORS.gray400}
+            color={
+              error
+                ? COLORS.danger
+                : isFocused
+                ? COLORS.primary
+                : COLORS.gray400
+            }
             style={iconStyle}
           />
         )}
@@ -155,9 +175,12 @@ const CustomInput: React.FC<CustomInputProps> = ({
           selectionColor={COLORS.primary}
         />
         {secureTextEntry && (
-          <TouchableOpacity onPress={togglePasswordVisibility} style={iconStyle}>
+          <TouchableOpacity
+            onPress={togglePasswordVisibility}
+            style={iconStyle}
+          >
             <Ionicons
-              name={isPasswordVisible ? 'eye-off-outline' : 'eye-outline'}
+              name={isPasswordVisible ? "eye-off-outline" : "eye-outline"}
               size={22}
               color={COLORS.gray400}
             />
@@ -168,7 +191,13 @@ const CustomInput: React.FC<CustomInputProps> = ({
             <Ionicons
               name={rightIcon}
               size={22}
-              color={error ? COLORS.danger : isFocused ? COLORS.primary : COLORS.gray400}
+              color={
+                error
+                  ? COLORS.danger
+                  : isFocused
+                  ? COLORS.primary
+                  : COLORS.gray400
+              }
             />
           </TouchableOpacity>
         )}

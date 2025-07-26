@@ -1,12 +1,12 @@
-import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import HomeScreen from '../screens/HomeScreen';
-import LoginScreen from '../screens/LoginScreen';
-import RegisterScreen from '../screens/RegisterScreen';
-import ForgotPasswordScreen from '../screens/ForgotPasswordScreen';
-import OTPVerificationScreen from '../screens/OTPVerificationScreen';
-import ResetPasswordScreen from '../screens/ResetPasswordScreen';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createNativeStackNavigator } from "@react-navigation/native-stack";
+import HomeScreen from "../screens/HomeScreen";
+import LoginScreen from "../screens/LoginScreen";
+import RegisterScreen from "../screens/RegisterScreen";
+import ForgotPasswordScreen from "../screens/ForgotPasswordScreen";
+import OTPVerificationScreen from "../screens/OTPVerificationScreen";
+import ResetPasswordScreen from "../screens/ResetPasswordScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -21,7 +21,7 @@ const Stack = createNativeStackNavigator<RootStackParamList>();
 
 const AppNavigator = () => (
   <NavigationContainer>
-    <Stack.Navigator 
+    <Stack.Navigator
       initialRouteName="Home"
       screenOptions={{
         headerShown: false,
