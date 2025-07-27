@@ -17,50 +17,22 @@ import { Ionicons } from "@expo/vector-icons";
 import { useNavigation } from "@react-navigation/native";
 import { NativeStackNavigationProp } from "@react-navigation/native-stack";
 import { useTranslation } from "react-i18next";
+import { COLORS } from "../constants/colors";
 
 // Define navigation types
 export type RootStackParamList = {
   Home: undefined;
   Login: undefined;
   Register: undefined;
+  CourseDetail: { courseId: string };
+  ReviewDetail: { courseId: string };
+  Cart: undefined;
+  Account: undefined;
 };
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
   "Home"
 >;
-
-export const COLORS = {
-  primary: "#6366F1",
-  primaryLight: "#818CF8",
-  primaryDark: "#4F46E5",
-  secondary: "#8B5CF6",
-  accent: "#A855F7",
-  gradientStart: "#667EEA",
-  gradientEnd: "#764BA2",
-  success: "#10B981",
-  danger: "#EF4444",
-  warning: "#F59E0B",
-  info: "#3B82F6",
-  background: "#F8FAFC",
-  surface: "#FFFFFF",
-  text: "#1E293B",
-  textSecondary: "#64748B",
-  textLight: "#94A3B8",
-  border: "#E2E8F0",
-  inputBackground: "#F1F5F9",
-  gray50: "#F8FAFC",
-  gray100: "#F1F5F9",
-  gray200: "#E2E8F0",
-  gray300: "#CBD5E1",
-  gray400: "#94A3B8",
-  gray500: "#64748B",
-  gray600: "#475569",
-  gray700: "#334155",
-  gray800: "#1E293B",
-  gray900: "#0F172A",
-  white: "#FFFFFF",
-  black: "#000000",
-};
 
 const { width } = Dimensions.get("window");
 
@@ -377,7 +349,7 @@ const HomeScreen = () => {
   const [showCategoriesModal, setShowCategoriesModal] = useState(false);
   const [currentBannerIndex, setCurrentBannerIndex] = useState(0);
   const bannerScrollRef = useRef<ScrollView>(null);
-  const { t } = useTranslation("vi:home");
+  const { t } = useTranslation();
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -426,7 +398,10 @@ const HomeScreen = () => {
   };
 
   const renderCourseCard = ({ item }: { item: any }) => (
-    <TouchableOpacity style={styles.courseCard}>
+    <TouchableOpacity 
+      style={styles.courseCard}
+      onPress={() => navigation.navigate('CourseDetail', { courseId: item.id })}
+    >
       <View style={styles.courseImageContainer}>
         <Image source={{ uri: item.image }} style={styles.courseImage} />
         {item.tag && (
@@ -573,7 +548,10 @@ const HomeScreen = () => {
           )}
         </View>
         <View style={styles.headerRight}>
-          <TouchableOpacity style={styles.headerIconButton}>
+          <TouchableOpacity 
+            style={styles.headerIconButton}
+            onPress={() => navigation.navigate("Cart")}
+          >
             <Ionicons name="cart-outline" size={24} color={COLORS.text} />
             <View style={styles.badge}>
               <Text style={styles.badgeText}>2</Text>
@@ -595,6 +573,7 @@ const HomeScreen = () => {
       <ScrollView
         style={styles.scrollView}
         showsVerticalScrollIndicator={false}
+        contentContainerStyle={styles.scrollContent}
       >
         {/* Search Bar */}
         <View style={styles.searchContainer}>
@@ -716,15 +695,18 @@ const HomeScreen = () => {
             size={24}
             color={COLORS.gray400}
           />
-          <Text style={styles.navText}>{t("learning")}</Text>
+          <Text style={styles.navText}>Học tập</Text>
         </TouchableOpacity>
         <TouchableOpacity style={styles.navItem}>
           <Ionicons name="heart-outline" size={24} color={COLORS.gray400} />
-          <Text style={styles.navText}>{t("favorites")}</Text>
+          <Text style={styles.navText}>Yêu thích</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Account")}
+        >
           <Ionicons name="person-outline" size={24} color={COLORS.gray400} />
-          <Text style={styles.navText}>{t("account")}</Text>
+          <Text style={styles.navText}>Tài khoản</Text>
         </TouchableOpacity>
       </View>
 
@@ -819,6 +801,9 @@ const styles = StyleSheet.create({
   },
   scrollView: {
     flex: 1,
+  },
+  scrollContent: {
+    paddingTop: 16,
   },
   searchContainer: {
     paddingHorizontal: 16,

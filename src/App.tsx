@@ -1,7 +1,7 @@
 import React from 'react';
 import { SafeAreaView } from 'react-native';
 import AppNavigator from './navigation/AppNavigator';
-import '../src/i18n';
+import './i18n';
 
 const App = () => {
   return (
