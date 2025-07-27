@@ -11,6 +11,9 @@ import CourseDetailScreen from "../screens/CourseDetailScreen";
 import ReviewDetailScreen from "../screens/ReviewDetailScreen";
 import CartScreen from "../screens/CartScreen";
 import AccountScreen from "../screens/AccountScreen";
+import NotificationScreen from "../screens/NotificationScreen";
+import LearningScreen from "../screens/LearningScreen";
+import FavoritesScreen from "../screens/FavoritesScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -23,7 +26,11 @@ export type RootStackParamList = {
   ReviewDetail: { courseId: string };
   Cart: undefined;
   Account: undefined;
+  Notification: undefined;
+  Learning: undefined;
+  Favorites: undefined;
   VideoPlayer: { videoUrl: string; title: string };
+  Certificate: { courseId: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -69,6 +76,30 @@ const AppNavigator = () => (
       <Stack.Screen 
         name="Account" 
         component={AccountScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="Notification" 
+        component={NotificationScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="Learning" 
+        component={LearningScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="Favorites" 
+        component={FavoritesScreen}
         options={{
           presentation: 'card',
           gestureEnabled: true,

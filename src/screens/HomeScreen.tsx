@@ -28,6 +28,9 @@ export type RootStackParamList = {
   ReviewDetail: { courseId: string };
   Cart: undefined;
   Account: undefined;
+  Notification: undefined;
+  Learning: undefined;
+  Favorites: undefined;
 };
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -557,7 +560,10 @@ const HomeScreen = () => {
               <Text style={styles.badgeText}>2</Text>
             </View>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.headerIconButton}>
+          <TouchableOpacity 
+            style={styles.headerIconButton}
+            onPress={() => navigation.navigate("Notification")}
+          >
             <Ionicons
               name="notifications-outline"
               size={24}
@@ -689,7 +695,10 @@ const HomeScreen = () => {
             Nổi bật
           </Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Learning")}
+        >
           <Ionicons
             name="play-circle-outline"
             size={24}
@@ -697,7 +706,10 @@ const HomeScreen = () => {
           />
           <Text style={styles.navText}>Học tập</Text>
         </TouchableOpacity>
-        <TouchableOpacity style={styles.navItem}>
+        <TouchableOpacity 
+          style={styles.navItem}
+          onPress={() => navigation.navigate("Favorites")}
+        >
           <Ionicons name="heart-outline" size={24} color={COLORS.gray400} />
           <Text style={styles.navText}>Yêu thích</Text>
         </TouchableOpacity>
