@@ -139,7 +139,8 @@ const mockVideoData = {
     }
   ],
   hasQuiz: true,
-  quizUnlocked: false // Quiz sẽ unlock khi xem hết video
+  //quizUnlocked: false // Quiz sẽ unlock khi xem hết video
+  quizUnlocked: true // Tạm thời mở khóa để test
 };
 
 // Mock learning progress data
@@ -160,7 +161,7 @@ const VideoPlayerScreen = () => {
   const navigation = useNavigation<VideoPlayerScreenNavigationProp>();
   const route = useRoute();
   const { t } = useTranslation();
-  const { videoUrl, title, courseId, lessonId } = route.params;
+  const { videoUrl, title, courseId, lessonId } = route.params as { videoUrl: string; title: string; courseId?: string; lessonId?: string } ;
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [currentTime, setCurrentTime] = useState(0);
@@ -626,7 +627,7 @@ const VideoPlayerScreen = () => {
     </View>
   );
 
-  // Quiz Modal
+  // Quiz Modal with enhanced design
   const renderQuizModal = () => {
     if (!showQuizModal) return null;
 
@@ -634,6 +635,7 @@ const VideoPlayerScreen = () => {
     const isLastQuestion = currentQuestionIndex === mockQuizData.questions.length - 1;
     const hasSelectedAnswer = selectedAnswers[currentQuestion.id] !== undefined;
 
+    // Quiz Results Screen
     if (showQuizResults) {
       const score = calculateQuizScore();
       return (
@@ -644,36 +646,73 @@ const VideoPlayerScreen = () => {
           onRequestClose={() => setShowQuizModal(false)}
         >
           <LinearGradient
-            colors={[COLORS.primary, COLORS.primaryDark]}
+            colors={[COLORS.primary, COLORS.primaryDark, COLORS.accent]}
             style={styles.quizResultsContainer}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 1 }}
           >
             <SafeAreaView style={styles.quizResultsContent}>
+              {/* Header with close button */}
               <View style={styles.quizResultsHeader}>
-                <TouchableOpacity onPress={() => setShowQuizModal(false)}>
+                <TouchableOpacity 
+                  style={styles.closeButton}
+                  onPress={() => setShowQuizModal(false)}
+                >
                   <Ionicons name="close" size={24} color={COLORS.white} />
                 </TouchableOpacity>
               </View>
 
+              {/* Results Body */}
               <View style={styles.quizResultsBody}>
-                <View style={styles.scoreCircle}>
-                  <LinearGradient
-                    colors={[getScoreColor(score.percentage), getScoreColor(score.percentage) + '80']}
-                    style={styles.scoreGradient}
-                  >
-                    <Text style={styles.scorePercentage}>{score.percentage}%</Text>
-                    <Text style={styles.scoreLabel}>Điểm số</Text>
-                  </LinearGradient>
+                {/* Animated Score Circle */}
+                <View style={styles.scoreCircleContainer}>
+                  <View style={styles.scoreCircle}>
+                    <LinearGradient
+                      colors={[getScoreColor(score.percentage), getScoreColor(score.percentage) + 'DD']}
+                      style={styles.scoreGradient}
+                    >
+                      <Text style={styles.scorePercentage}>{score.percentage}%</Text>
+                      <Text style={styles.scoreLabel}>Điểm số</Text>
+                    </LinearGradient>
+                  </View>
+                  
+                  {/* Achievement badges */}
+                  {score.percentage >= 80 && (
+                    <View style={styles.achievementBadge}>
+                      <Ionicons name="trophy" size={20} color={COLORS.warning} />
+                    </View>
+                  )}
                 </View>
 
                 <Text style={styles.scoreTitle}>
                   {score.percentage >= 80 ? 'Xuất sắc! 🎉' : 
-                   score.percentage >= 60 ? 'Tốt! 👍' : 'Cần cải thiện 📚'}
+                   score.percentage >= 60 ? 'Tốt lắm! 👍' : 'Cần cải thiện 📚'}
                 </Text>
 
                 <Text style={styles.scoreDescription}>
                   Bạn đã trả lời đúng {score.correct}/{score.total} câu hỏi
                 </Text>
 
+                {/* Score breakdown */}
+                <View style={styles.scoreBreakdown}>
+                  <View style={styles.scoreItem}>
+                    <Ionicons name="checkmark-circle" size={24} color={COLORS.success} />
+                    <Text style={styles.scoreItemLabel}>Đúng</Text>
+                    <Text style={styles.scoreItemValue}>{score.correct}</Text>
+                  </View>
+                  <View style={styles.scoreItem}>
+                    <Ionicons name="close-circle" size={24} color={COLORS.danger} />
+                    <Text style={styles.scoreItemLabel}>Sai</Text>
+                    <Text style={styles.scoreItemValue}>{score.total - score.correct}</Text>
+                  </View>
+                  <View style={styles.scoreItem}>
+                    <Ionicons name="time" size={24} color={COLORS.info} />
+                    <Text style={styles.scoreItemLabel}>Thời gian</Text>
+                    <Text style={styles.scoreItemValue}>5:30</Text>
+                  </View>
+                </View>
+
+                {/* Action buttons */}
                 <View style={styles.quizActions}>
                   <TouchableOpacity 
                     style={styles.reviewButton}
@@ -698,6 +737,17 @@ const VideoPlayerScreen = () => {
                     <Text style={styles.retakeButtonText}>Làm lại</Text>
                   </TouchableOpacity>
                 </View>
+
+                {/* Motivational message */}
+                <View style={styles.motivationContainer}>
+                  <Text style={styles.motivationText}>
+                    {score.percentage >= 80 
+                      ? "Bạn đã nắm vững kiến thức! Hãy tiếp tục với bài học tiếp theo."
+                      : score.percentage >= 60
+                      ? "Kết quả tốt! Hãy xem lại một số câu để hiểu rõ hơn."
+                      : "Đừng nản lòng! Hãy xem lại video và thử lại nhé."}
+                  </Text>
+                </View>
               </View>
             </SafeAreaView>
           </LinearGradient>
@@ -705,6 +755,7 @@ const VideoPlayerScreen = () => {
       );
     }
 
+    // Quiz Question Screen
     return (
       <Modal
         visible={showQuizModal}
@@ -713,34 +764,57 @@ const VideoPlayerScreen = () => {
         onRequestClose={() => setShowQuizModal(false)}
       >
         <SafeAreaView style={styles.quizContainer}>
-          <View style={styles.quizHeader}>
-            <TouchableOpacity onPress={() => setShowQuizModal(false)}>
-              <Ionicons name="close" size={24} color={COLORS.text} />
+          {/* Enhanced Header */}
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryLight]}
+            style={styles.quizHeader}
+            start={{ x: 0, y: 0 }}
+            end={{ x: 1, y: 0 }}
+          >
+            <TouchableOpacity 
+              style={styles.quizCloseButton}
+              onPress={() => setShowQuizModal(false)}
+            >
+              <Ionicons name="close" size={24} color={COLORS.white} />
             </TouchableOpacity>
             
-            <View style={styles.quizProgress}>
-              <Text style={styles.quizProgressText}>
-                {currentQuestionIndex + 1}/{mockQuizData.questions.length}
-              </Text>
-              <View style={styles.quizProgressBar}>
-                <View 
-                  style={[
-                    styles.quizProgressFill, 
-                    { width: `${((currentQuestionIndex + 1) / mockQuizData.questions.length) * 100}%` }
-                  ]} 
-                />
+            <View style={styles.quizHeaderCenter}>
+              <Text style={styles.quizTitle}>{mockQuizData.title}</Text>
+              <View style={styles.quizProgress}>
+                <Text style={styles.quizProgressText}>
+                  Câu {currentQuestionIndex + 1} / {mockQuizData.questions.length}
+                </Text>
+                <View style={styles.quizProgressBar}>
+                  <View 
+                    style={[
+                      styles.quizProgressFill, 
+                      { width: `${((currentQuestionIndex + 1) / mockQuizData.questions.length) * 100}%` }
+                    ]} 
+                  />
+                </View>
               </View>
             </View>
 
             <View style={styles.quizHeaderPlaceholder} />
-          </View>
+          </LinearGradient>
 
-          <ScrollView style={styles.quizContent}>
-            <View style={styles.questionContainer}>
-              <Text style={styles.questionTitle}>Câu hỏi {currentQuestionIndex + 1}</Text>
+          <ScrollView style={styles.quizContent} showsVerticalScrollIndicator={false}>
+            {/* Question Card */}
+            <View style={styles.questionCard}>
+              <View style={styles.questionHeader}>
+                <View style={styles.questionBadge}>
+                  <Text style={styles.questionBadgeText}>Câu {currentQuestionIndex + 1}</Text>
+                </View>
+                <View style={styles.difficultyBadge}>
+                  <Ionicons name="star" size={12} color={COLORS.warning} />
+                  <Text style={styles.difficultyText}>Cơ bản</Text>
+                </View>
+              </View>
+              
               <Text style={styles.questionText}>{currentQuestion.question}</Text>
             </View>
 
+            {/* Options Container */}
             <View style={styles.optionsContainer}>
               {currentQuestion.options.map((option, index) => {
                 const isSelected = selectedAnswers[currentQuestion.id] === index;
@@ -752,72 +826,120 @@ const VideoPlayerScreen = () => {
                     key={index}
                     style={[
                       styles.optionButton,
-                      isSelected && styles.optionSelected,
+                      isSelected && !showResults && styles.optionSelected,
                       showResults && isCorrect && styles.optionCorrect,
                       showResults && isSelected && !isCorrect && styles.optionIncorrect
                     ]}
                     onPress={() => !showResults && selectAnswer(currentQuestion.id, index)}
                     disabled={showResults}
+                    activeOpacity={0.8}
                   >
-                    <View style={styles.optionContent}>
-                      <View style={[
-                        styles.optionIndicator,
-                        isSelected && styles.optionIndicatorSelected,
-                        showResults && isCorrect && styles.optionIndicatorCorrect,
-                        showResults && isSelected && !isCorrect && styles.optionIndicatorIncorrect
-                      ]}>
-                        {showResults ? (
-                          isCorrect ? (
-                            <Ionicons name="checkmark" size={16} color={COLORS.white} />
-                          ) : isSelected ? (
-                            <Ionicons name="close" size={16} color={COLORS.white} />
+                    <LinearGradient
+                      colors={
+                        showResults && isCorrect 
+                          ? [COLORS.success + '20', COLORS.success + '10']
+                          : showResults && isSelected && !isCorrect
+                          ? [COLORS.danger + '20', COLORS.danger + '10']
+                          : isSelected
+                          ? [COLORS.primary + '20', COLORS.primary + '10']
+                          : ['transparent', 'transparent']
+                      }
+                      style={styles.optionGradient}
+                    >
+                      <View style={styles.optionContent}>
+                        <View style={[
+                          styles.optionIndicator,
+                          isSelected && !showResults && styles.optionIndicatorSelected,
+                          showResults && isCorrect && styles.optionIndicatorCorrect,
+                          showResults && isSelected && !isCorrect && styles.optionIndicatorIncorrect
+                        ]}>
+                          {showResults ? (
+                            isCorrect ? (
+                              <Ionicons name="checkmark" size={16} color={COLORS.white} />
+                            ) : isSelected ? (
+                              <Ionicons name="close" size={16} color={COLORS.white} />
+                            ) : (
+                              <Text style={styles.optionLetter}>{String.fromCharCode(65 + index)}</Text>
+                            )
                           ) : (
-                            <Text style={styles.optionLetter}>{String.fromCharCode(65 + index)}</Text>
-                          )
-                        ) : (
-                          <Text style={[
-                            styles.optionLetter,
-                            isSelected && styles.optionLetterSelected
-                          ]}>
-                            {String.fromCharCode(65 + index)}
-                          </Text>
+                            <Text style={[
+                              styles.optionLetter,
+                              isSelected && styles.optionLetterSelected
+                            ]}>
+                              {String.fromCharCode(65 + index)}
+                            </Text>
+                          )}
+                        </View>
+                        <Text style={[
+                          styles.optionText,
+                          isSelected && !showResults && styles.optionTextSelected,
+                          showResults && isCorrect && styles.optionTextCorrect,
+                          showResults && isSelected && !isCorrect && styles.optionTextIncorrect
+                        ]}>
+                          {option}
+                        </Text>
+                        
+                        {/* Checkmark animation for selected */}
+                        {isSelected && !showResults && (
+                          <View style={styles.selectedIndicator}>
+                            <Ionicons name="checkmark-circle" size={20} color={COLORS.primary} />
+                          </View>
                         )}
                       </View>
-                      <Text style={[
-                        styles.optionText,
-                        isSelected && styles.optionTextSelected,
-                        showResults && isCorrect && styles.optionTextCorrect,
-                        showResults && isSelected && !isCorrect && styles.optionTextIncorrect
-                      ]}>
-                        {option}
-                      </Text>
-                    </View>
+                    </LinearGradient>
                   </TouchableOpacity>
                 );
               })}
             </View>
 
-            {showResults && (
+            {/* Explanation for review mode */}
+            {(quizCompleted || showQuizResults) && (
               <View style={styles.explanationContainer}>
-                <View style={styles.explanationHeader}>
-                  <Ionicons name="bulb" size={20} color={COLORS.warning} />
-                  <Text style={styles.explanationTitle}>Giải thích</Text>
-                </View>
-                <Text style={styles.explanationText}>{currentQuestion.explanation}</Text>
+                <LinearGradient
+                  colors={[COLORS.warning + '15', COLORS.warning + '05']}
+                  style={styles.explanationGradient}
+                >
+                  <View style={styles.explanationHeader}>
+                    <View style={styles.explanationIcon}>
+                      <Ionicons name="bulb" size={20} color={COLORS.warning} />
+                    </View>
+                    <Text style={styles.explanationTitle}>Giải thích</Text>
+                  </View>
+                  <Text style={styles.explanationText}>{currentQuestion.explanation}</Text>
+                </LinearGradient>
+              </View>
+            )}
+
+            {/* Help hint when no answer selected */}
+            {!hasSelectedAnswer && !(quizCompleted || showQuizResults) && (
+              <View style={styles.hintContainer}>
+                <Ionicons name="information-circle" size={16} color={COLORS.info} />
+                <Text style={styles.hintText}>Chọn một đáp án để tiếp tục</Text>
               </View>
             )}
           </ScrollView>
 
-          <View style={styles.quizFooter}>
+          {/* Enhanced Footer */}
+          <LinearGradient
+            colors={[COLORS.white, COLORS.gray50]}
+            style={styles.quizFooter}
+          >
             <TouchableOpacity 
-              style={[styles.quizNavButton, currentQuestionIndex === 0 && styles.quizNavButtonDisabled]}
+              style={[
+                styles.quizNavButton, 
+                (currentQuestionIndex === 0 || quizCompleted || showQuizResults) && styles.quizNavButtonDisabled
+              ]}
               onPress={previousQuestion}
-              disabled={currentQuestionIndex === 0}
+              disabled={currentQuestionIndex === 0 || quizCompleted || showQuizResults}
             >
-              <Ionicons name="chevron-back" size={20} color={currentQuestionIndex === 0 ? COLORS.gray400 : COLORS.primary} />
+              <Ionicons 
+                name="chevron-back" 
+                size={20} 
+                color={currentQuestionIndex === 0 || quizCompleted || showQuizResults ? COLORS.gray400 : COLORS.primary} 
+              />
               <Text style={[
                 styles.quizNavButtonText,
-                currentQuestionIndex === 0 && styles.quizNavButtonTextDisabled
+                (currentQuestionIndex === 0 || quizCompleted || showQuizResults) && styles.quizNavButtonTextDisabled
               ]}>
                 Trước
               </Text>
@@ -826,24 +948,33 @@ const VideoPlayerScreen = () => {
             <TouchableOpacity 
               style={[
                 styles.quizSubmitButton,
-                !hasSelectedAnswer && styles.quizSubmitButtonDisabled
+                (!hasSelectedAnswer && !(quizCompleted || showQuizResults)) && styles.quizSubmitButtonDisabled
               ]}
               onPress={nextQuestion}
-              disabled={!hasSelectedAnswer}
+              disabled={!hasSelectedAnswer && !(quizCompleted || showQuizResults)}
             >
-              <Text style={[
-                styles.quizSubmitButtonText,
-                !hasSelectedAnswer && styles.quizSubmitButtonTextDisabled
-              ]}>
-                {isLastQuestion ? 'Hoàn thành' : 'Tiếp theo'}
-              </Text>
-              <Ionicons 
-                name={isLastQuestion ? "checkmark" : "chevron-forward"} 
-                size={20} 
-                color={hasSelectedAnswer ? COLORS.white : COLORS.gray400} 
-              />
+              <LinearGradient
+                colors={
+                  hasSelectedAnswer || (quizCompleted || showQuizResults)
+                    ? [COLORS.primary, COLORS.primaryDark] 
+                    : [COLORS.gray300, COLORS.gray400]
+                }
+                style={styles.submitButtonGradient}
+              >
+                <Text style={[
+                  styles.quizSubmitButtonText,
+                  (!hasSelectedAnswer && !(quizCompleted || showQuizResults)) && styles.quizSubmitButtonTextDisabled
+                ]}>
+                  {isLastQuestion ? 'Hoàn thành' : 'Tiếp theo'}
+                </Text>
+                <Ionicons 
+                  name={isLastQuestion ? "checkmark" : "chevron-forward"} 
+                  size={20} 
+                  color={(hasSelectedAnswer || (quizCompleted || showQuizResults)) ? COLORS.white : COLORS.gray500} 
+                />
+              </LinearGradient>
             </TouchableOpacity>
-          </View>
+          </LinearGradient>
         </SafeAreaView>
       </Modal>
     );
@@ -1397,6 +1528,26 @@ const styles = StyleSheet.create({
     borderBottomWidth: 1,
     borderBottomColor: COLORS.border,
   },
+  quizCloseButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  quizHeaderCenter: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 20,
+  },
+  quizTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.white,
+    marginBottom: 8,
+    textAlign: 'center',
+  },
   quizProgress: {
     flex: 1,
     alignItems: 'center',
@@ -1430,6 +1581,48 @@ const styles = StyleSheet.create({
   questionContainer: {
     marginBottom: 24,
   },
+  questionCard: {
+    backgroundColor: COLORS.white,
+    borderRadius: 16,
+    padding: 20,
+    marginBottom: 24,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  questionHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  questionBadge: {
+    backgroundColor: COLORS.primary + '15',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 12,
+  },
+  questionBadgeText: {
+    fontSize: 12,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  difficultyBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.warning + '15',
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 8,
+    gap: 4,
+  },
+  difficultyText: {
+    fontSize: 10,
+    color: COLORS.warning,
+    fontWeight: '600',
+  },
   questionTitle: {
     fontSize: 16,
     fontWeight: 'bold',
@@ -1451,6 +1644,10 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     backgroundColor: COLORS.white,
     overflow: 'hidden',
+  },
+  optionGradient: {
+    flex: 1,
+    padding: 16,
   },
   optionSelected: {
     borderColor: COLORS.primary,
@@ -1513,6 +1710,11 @@ const styles = StyleSheet.create({
     color: COLORS.danger,
     fontWeight: '600',
   },
+  selectedIndicator: {
+    position: 'absolute',
+    right: 16,
+    top: 16,
+  },
   explanationContainer: {
     marginTop: 24,
     padding: 16,
@@ -1520,6 +1722,32 @@ const styles = StyleSheet.create({
     borderRadius: 12,
     borderLeftWidth: 4,
     borderLeftColor: COLORS.warning,
+  },
+  explanationGradient: {
+    padding: 16,
+    borderRadius: 12,
+  },
+  explanationIcon: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.warning + '20',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  hintContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.info + '10',
+    padding: 12,
+    borderRadius: 8,
+    marginTop: 16,
+    gap: 8,
+  },
+  hintText: {
+    fontSize: 14,
+    color: COLORS.info,
+    fontWeight: '500',
   },
   explanationHeader: {
     flexDirection: 'row',
@@ -1586,6 +1814,14 @@ const styles = StyleSheet.create({
   quizSubmitButtonTextDisabled: {
     color: COLORS.gray400,
   },
+  submitButtonGradient: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
 
   // Quiz Results
   quizResultsContainer: {
@@ -1600,11 +1836,23 @@ const styles = StyleSheet.create({
     paddingHorizontal: 20,
     paddingTop: 16,
   },
+  closeButton: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
   quizResultsBody: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: 32,
+  },
+  scoreCircleContainer: {
+    position: 'relative',
+    marginBottom: 32,
   },
   scoreCircle: {
     marginBottom: 32,
@@ -1626,6 +1874,22 @@ const styles = StyleSheet.create({
     color: 'rgba(255,255,255,0.9)',
     marginTop: 4,
   },
+  achievementBadge: {
+    position: 'absolute',
+    top: -10,
+    right: -10,
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    backgroundColor: COLORS.white,
+    justifyContent: 'center',
+    alignItems: 'center',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 4,
+    elevation: 5,
+  },
   scoreTitle: {
     fontSize: 24,
     fontWeight: 'bold',
@@ -1637,7 +1901,38 @@ const styles = StyleSheet.create({
     fontSize: 16,
     color: 'rgba(255,255,255,0.8)',
     textAlign: 'center',
-    marginBottom: 48,
+    marginBottom: 32,
+  },
+  scoreBreakdown: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    width: '100%',
+    marginBottom: 32,
+  },
+  scoreItem: {
+    alignItems: 'center',
+    gap: 8,
+  },
+  scoreItemLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  scoreItemValue: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
+  motivationContainer: {
+    backgroundColor: 'rgba(255,255,255,0.1)',
+    padding: 16,
+    borderRadius: 12,
+    marginTop: 16,
+  },
+  motivationText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    textAlign: 'center',
+    lineHeight: 20,
   },
   quizActions: {
     flexDirection: 'row',

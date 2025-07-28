@@ -31,6 +31,7 @@ export type RootStackParamList = {
   Notification: undefined;
   Learning: undefined;
   Favorites: undefined;
+  VideoPlayer: { videoUrl: string; title: string; courseId?: string; lessonId?: string };
   SearchResults: { query?: string; category?: string };
 };
 type HomeScreenNavigationProp = NativeStackNavigationProp<
@@ -604,6 +605,24 @@ const HomeScreen = () => {
           </TouchableOpacity>
         </View>
 
+        {/* Test Video Player Button */}
+        <View style={styles.testButtonContainer}>
+          <TouchableOpacity
+            style={styles.testVideoButton}
+            onPress={() => {
+              navigation.navigate('VideoPlayer', {
+                videoUrl: 'https://example.com/video.mp4',
+                title: 'Test Video Player',
+                courseId: 'test-course',
+                lessonId: 'test-lesson'
+              });
+            }}
+          >
+            <Ionicons name="play-circle" size={20} color={COLORS.white} />
+            <Text style={styles.testVideoButtonText}>Test Video Player & Quiz</Text>
+          </TouchableOpacity>
+        </View>
+
         {/* Categories */}
         <View style={styles.categoriesSection}>
           <View style={styles.categoriesHeader}>
@@ -1109,6 +1128,24 @@ const styles = StyleSheet.create({
     padding: 16,
     borderRadius: 12,
     alignItems: "center",
+  },
+  testButtonContainer: {
+    paddingHorizontal: 16,
+    marginBottom: 16,
+  },
+  testVideoButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  testVideoButtonText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.white,
   },
   categoryIcon: {
     width: 50,
