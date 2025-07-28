@@ -41,7 +41,7 @@ const mockFavorites = [
     discount: 75,
     image: 'https://picsum.photos/200/120?random=1',
     duration: '15 giờ',
-    level: 'Beginner',
+    level: 'Cơ bản',
     tag: 'Bán chạy nhất',
     addedDate: '2024-01-15',
     category: 'Lập trình',
@@ -59,7 +59,7 @@ const mockFavorites = [
     discount: 60,
     image: 'https://picsum.photos/200/120?random=2',
     duration: '20 giờ',
-    level: 'Intermediate',
+    level: 'Trung cấp',
     tag: 'Mới nhất',
     addedDate: '2024-01-12',
     category: 'Mobile Development',
@@ -77,7 +77,7 @@ const mockFavorites = [
     discount: 63,
     image: 'https://picsum.photos/200/120?random=3',
     duration: '18 giờ',
-    level: 'Beginner',
+    level: 'Cơ bản',
     addedDate: '2024-01-10',
     category: 'Thiết kế',
     isInCart: false,
@@ -94,7 +94,7 @@ const mockFavorites = [
     discount: 60,
     image: 'https://picsum.photos/200/120?random=4',
     duration: '22 giờ',
-    level: 'Intermediate',
+    level: 'Trung cấp',
     addedDate: '2024-01-08',
     category: 'Marketing',
     isInCart: false,
@@ -111,7 +111,7 @@ const mockFavorites = [
     discount: 61,
     image: 'https://picsum.photos/200/120?random=5',
     duration: '16 giờ',
-    level: 'Advanced',
+    level: 'Nâng cao',
     addedDate: '2024-01-05',
     category: 'Backend',
     isInCart: false,
@@ -128,7 +128,7 @@ const mockFavorites = [
     discount: 64,
     image: 'https://picsum.photos/200/120?random=6',
     duration: '14 giờ',
-    level: 'Beginner',
+    level: 'Cơ bản',
     addedDate: '2024-01-03',
     category: 'Thiết kế',
     isInCart: false,
@@ -151,10 +151,10 @@ const FavoritesScreen = () => {
   const categories = ['all', 'Lập trình', 'Thiết kế', 'Marketing', 'Mobile Development', 'Backend'];
   
   const sortOptions = [
-    { key: 'dateAdded', label: t('favorites.sortByDateAdded') },
-    { key: 'title', label: t('favorites.sortByTitle') },
-    { key: 'rating', label: t('favorites.sortByRating') },
-    { key: 'price', label: t('favorites.sortByPrice') }
+    { key: 'dateAdded', label: 'Theo ngày thêm' },
+    { key: 'title', label: 'Theo tên khóa học' },
+    { key: 'rating', label: 'Theo đánh giá cao nhất' },
+    { key: 'price', label: 'Theo giá thấp nhất' }
   ];
 
   const getFilteredAndSortedFavorites = () => {
@@ -218,12 +218,12 @@ const FavoritesScreen = () => {
 
   const removeFromFavorites = (courseId: string) => {
     Alert.alert(
-      t('favorites.removeConfirmTitle'),
-      t('favorites.removeConfirmMessage'),
+      'Xóa khỏi yêu thích',
+      'Bạn có chắc muốn xóa khóa học này khỏi danh sách yêu thích?',
       [
-        { text: t('favorites.cancel'), style: 'cancel' },
+        { text: 'Hủy', style: 'cancel' },
         {
-          text: t('favorites.remove'),
+          text: 'Xóa',
           style: 'destructive',
           onPress: () => {
             setFavorites(prev => prev.filter(item => item.id !== courseId));
@@ -253,12 +253,12 @@ const FavoritesScreen = () => {
 
   const removeSelectedItems = () => {
     Alert.alert(
-      t('favorites.removeSelectedTitle'),
-      t('favorites.removeSelectedMessage', { count: selectedItems.length }),
+      'Xóa khóa học đã chọn',
+      `Bạn có chắc muốn xóa ${selectedItems.length} khóa học đã chọn khỏi danh sách yêu thích?`,
       [
-        { text: t('favorites.cancel'), style: 'cancel' },
+        { text: 'Hủy', style: 'cancel' },
         {
-          text: t('favorites.remove'),
+          text: 'Xóa',
           style: 'destructive',
           onPress: () => {
             setFavorites(prev => prev.filter(item => !selectedItems.includes(item.id)));
@@ -275,7 +275,7 @@ const FavoritesScreen = () => {
     );
     
     if (selectedCourses.length === 0) {
-      Alert.alert(t('favorites.info'), t('favorites.allInCartAlready'));
+      Alert.alert('Thông tin', 'Tất cả khóa học đã chọn đều có trong giỏ hàng');
       return;
     }
 
@@ -288,8 +288,8 @@ const FavoritesScreen = () => {
     );
     
     Alert.alert(
-      t('favorites.success'), 
-      t('favorites.addedToCart', { count: selectedCourses.length })
+      'Thành công', 
+      `Đã thêm ${selectedCourses.length} khóa học vào giỏ hàng`
     );
     setSelectedItems([]);
   };
@@ -362,7 +362,7 @@ const FavoritesScreen = () => {
                 <>
                   <Text style={styles.originalPrice}>{formatPrice(item.originalPrice)}</Text>
                   <View style={styles.discountBadge}>
-                    <Text style={styles.discountText}>{item.discount}% {t('favorites.off')}</Text>
+                    <Text style={styles.discountText}>{item.discount}% GIẢM</Text>
                   </View>
                 </>
               )}
@@ -380,7 +380,7 @@ const FavoritesScreen = () => {
                         fav.id === item.id ? { ...fav, isInCart: true } : fav
                       )
                     );
-                    Alert.alert(t('favorites.success'), t('favorites.addedToCartSingle'));
+                    Alert.alert('Thành công', 'Đã thêm vào giỏ hàng');
                   }
                 }}
               >
@@ -393,7 +393,7 @@ const FavoritesScreen = () => {
                   styles.actionButtonText,
                   { color: item.isInCart ? COLORS.success : COLORS.primary }
                 ]}>
-                  {item.isInCart ? t('favorites.inCart') : t('favorites.addToCart')}
+                  {item.isInCart ? 'Trong giỏ hàng' : 'Thêm vào giỏ'}
                 </Text>
               </TouchableOpacity>
 
@@ -419,7 +419,7 @@ const FavoritesScreen = () => {
     >
       <SafeAreaView style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{t('favorites.sortBy')}</Text>
+          <Text style={styles.modalTitle}>Sắp xếp theo</Text>
           <TouchableOpacity onPress={() => setShowSortModal(false)}>
             <Ionicons name="close" size={24} color={COLORS.text} />
           </TouchableOpacity>
@@ -462,7 +462,7 @@ const FavoritesScreen = () => {
     >
       <SafeAreaView style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{t('favorites.filterBy')}</Text>
+          <Text style={styles.modalTitle}>Lọc theo</Text>
           <TouchableOpacity onPress={() => setShowFilterModal(false)}>
             <Ionicons name="close" size={24} color={COLORS.text} />
           </TouchableOpacity>
@@ -484,7 +484,7 @@ const FavoritesScreen = () => {
                 styles.optionText,
                 filterCategory === category && styles.selectedOptionText
               ]}>
-                {category === 'all' ? t('favorites.allCategories') : category}
+                {category === 'all' ? 'Tất cả danh mục' : category}
               </Text>
               {filterCategory === category && (
                 <Ionicons name="checkmark" size={20} color={COLORS.primary} />
@@ -510,7 +510,7 @@ const FavoritesScreen = () => {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('favorites.title')} ({favorites.length})</Text>
+        <Text style={styles.headerTitle}>Yêu thích ({favorites.length})</Text>
         <TouchableOpacity 
           style={styles.viewModeButton}
           onPress={() => setViewMode(viewMode === 'grid' ? 'list' : 'grid')}
@@ -529,7 +529,7 @@ const FavoritesScreen = () => {
           <Ionicons name="search-outline" size={20} color={COLORS.gray400} />
           <TextInput
             style={styles.searchInput}
-            placeholder={t('favorites.searchPlaceholder')}
+            placeholder="Tìm kiếm khóa học yêu thích..."
             value={searchText}
             onChangeText={setSearchText}
             placeholderTextColor={COLORS.gray400}
@@ -550,7 +550,7 @@ const FavoritesScreen = () => {
             onPress={() => setShowSortModal(true)}
           >
             <Ionicons name="swap-vertical-outline" size={16} color={COLORS.primary} />
-            <Text style={styles.filterButtonText}>{t('favorites.sort')}</Text>
+            <Text style={styles.filterButtonText}>Sắp xếp</Text>
           </TouchableOpacity>
           
           <TouchableOpacity 
@@ -558,7 +558,7 @@ const FavoritesScreen = () => {
             onPress={() => setShowFilterModal(true)}
           >
             <Ionicons name="funnel-outline" size={16} color={COLORS.primary} />
-            <Text style={styles.filterButtonText}>{t('favorites.filter')}</Text>
+            <Text style={styles.filterButtonText}>Lọc</Text>
             {filterCategory !== 'all' && <View style={styles.filterDot} />}
           </TouchableOpacity>
         </View>
@@ -570,7 +570,7 @@ const FavoritesScreen = () => {
               onPress={selectedItems.length === filteredFavorites.length ? deselectAll : selectAll}
             >
               <Text style={styles.selectionActionText}>
-                {selectedItems.length === filteredFavorites.length ? t('favorites.deselectAll') : t('favorites.selectAll')}
+                {selectedItems.length === filteredFavorites.length ? 'Bỏ chọn tất cả' : 'Chọn tất cả'}
               </Text>
             </TouchableOpacity>
           </View>
@@ -581,7 +581,7 @@ const FavoritesScreen = () => {
       {selectedItems.length > 0 && (
         <View style={styles.selectedActionsBar}>
           <Text style={styles.selectedCountText}>
-            {t('favorites.selectedCount', { count: selectedItems.length })}
+            Đã chọn {selectedItems.length} khóa học
           </Text>
           <View style={styles.selectedActions}>
             <TouchableOpacity 
@@ -589,7 +589,7 @@ const FavoritesScreen = () => {
               onPress={addSelectedToCart}
             >
               <Ionicons name="cart-outline" size={16} color={COLORS.primary} />
-              <Text style={styles.selectedActionText}>{t('favorites.addToCart')}</Text>
+              <Text style={styles.selectedActionText}>Thêm vào giỏ</Text>
             </TouchableOpacity>
             <TouchableOpacity 
               style={[styles.selectedActionButton, styles.removeActionButton]}
@@ -597,7 +597,7 @@ const FavoritesScreen = () => {
             >
               <Ionicons name="trash-outline" size={16} color={COLORS.danger} />
               <Text style={[styles.selectedActionText, { color: COLORS.danger }]}>
-                {t('favorites.remove')}
+                Xóa
               </Text>
             </TouchableOpacity>
           </View>
@@ -627,14 +627,14 @@ const FavoritesScreen = () => {
           </View>
           <Text style={styles.emptyTitle}>
             {searchText || filterCategory !== 'all' 
-              ? t('favorites.noResults') 
-              : t('favorites.emptyTitle')
+              ? 'Không tìm thấy kết quả' 
+              : 'Chưa có khóa học yêu thích'
             }
           </Text>
           <Text style={styles.emptySubtitle}>
             {searchText || filterCategory !== 'all'
-              ? t('favorites.noResultsDesc')
-              : t('favorites.emptySubtitle')
+              ? 'Thử thay đổi từ khóa tìm kiếm hoặc bộ lọc'
+              : 'Hãy thêm các khóa học bạn quan tâm vào danh sách yêu thích'
             }
           </Text>
           {(!searchText && filterCategory === 'all') && (
@@ -642,7 +642,7 @@ const FavoritesScreen = () => {
               style={styles.browseButton}
               onPress={() => navigation.navigate('Home')}
             >
-              <Text style={styles.browseButtonText}>{t('favorites.browseCourses')}</Text>
+              <Text style={styles.browseButtonText}>Khám phá khóa học</Text>
             </TouchableOpacity>
           )}
         </View>

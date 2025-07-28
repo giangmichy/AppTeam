@@ -27,7 +27,7 @@ type RootStackParamList = {
 type NotificationScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'Notification'>;
 
 // Mock notifications data
-const mockNotifications = [
+  const mockNotifications = [
   {
     id: '1',
     type: 'course_update',
@@ -254,7 +254,7 @@ const NotificationScreen = () => {
     >
       <SafeAreaView style={styles.modalContainer}>
         <View style={styles.modalHeader}>
-          <Text style={styles.modalTitle}>{t('notifications.settings')}</Text>
+          <Text style={styles.modalTitle}>Cài đặt thông báo</Text>
           <TouchableOpacity onPress={() => setShowSettings(false)}>
             <Ionicons name="close" size={24} color={COLORS.text} />
           </TouchableOpacity>
@@ -262,12 +262,12 @@ const NotificationScreen = () => {
 
         <ScrollView style={styles.settingsContent}>
           <View style={styles.settingsSection}>
-            <Text style={styles.settingsSectionTitle}>{t('notifications.courseNotifications')}</Text>
+            <Text style={styles.settingsSectionTitle}>Thông báo khóa học</Text>
             
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.courseUpdates')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.courseUpdatesDesc')}</Text>
+                <Text style={styles.settingTitle}>Cập nhật khóa học</Text>
+                <Text style={styles.settingDescription}>Nhận thông báo khi có bài học mới hoặc nội dung được cập nhật</Text>
               </View>
               <Switch
                 value={notificationSettings.courseUpdates}
@@ -279,8 +279,8 @@ const NotificationScreen = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.assignments')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.assignmentsDesc')}</Text>
+                <Text style={styles.settingTitle}>Bài tập</Text>
+                <Text style={styles.settingDescription}>Thông báo về bài tập mới và hạn nộp</Text>
               </View>
               <Switch
                 value={notificationSettings.assignments}
@@ -292,8 +292,8 @@ const NotificationScreen = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.reminders')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.remindersDesc')}</Text>
+                <Text style={styles.settingTitle}>Nhắc nhở học tập</Text>
+                <Text style={styles.settingDescription}>Nhắc nhở hàng ngày để duy trì tiến độ học tập</Text>
               </View>
               <Switch
                 value={notificationSettings.reminders}
@@ -305,12 +305,12 @@ const NotificationScreen = () => {
           </View>
 
           <View style={styles.settingsSection}>
-            <Text style={styles.settingsSectionTitle}>{t('notifications.marketingNotifications')}</Text>
+            <Text style={styles.settingsSectionTitle}>Thông báo khuyến mãi</Text>
             
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.promotions')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.promotionsDesc')}</Text>
+                <Text style={styles.settingTitle}>Ưu đãi và khuyến mãi</Text>
+                <Text style={styles.settingDescription}>Nhận thông báo về các chương trình giảm giá và ưu đãi đặc biệt</Text>
               </View>
               <Switch
                 value={notificationSettings.promotions}
@@ -322,12 +322,12 @@ const NotificationScreen = () => {
           </View>
 
           <View style={styles.settingsSection}>
-            <Text style={styles.settingsSectionTitle}>{t('notifications.otherNotifications')}</Text>
+            <Text style={styles.settingsSectionTitle}>Thông báo khác</Text>
             
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.instructorMessages')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.instructorMessagesDesc')}</Text>
+                <Text style={styles.settingTitle}>Tin nhắn giảng viên</Text>
+                <Text style={styles.settingDescription}>Thông báo khi giảng viên gửi tin nhắn hoặc trả lời câu hỏi</Text>
               </View>
               <Switch
                 value={notificationSettings.instructorMessages}
@@ -339,8 +339,8 @@ const NotificationScreen = () => {
 
             <View style={styles.settingItem}>
               <View style={styles.settingInfo}>
-                <Text style={styles.settingTitle}>{t('notifications.systemUpdates')}</Text>
-                <Text style={styles.settingDescription}>{t('notifications.systemUpdatesDesc')}</Text>
+                <Text style={styles.settingTitle}>Cập nhật hệ thống</Text>
+                <Text style={styles.settingDescription}>Thông báo về phiên bản mới và bảo trì hệ thống</Text>
               </View>
               <Switch
                 value={notificationSettings.systemUpdates}
@@ -368,7 +368,7 @@ const NotificationScreen = () => {
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
         <View style={styles.headerCenter}>
-          <Text style={styles.headerTitle}>{t('notifications.title')}</Text>
+          <Text style={styles.headerTitle}>Thông báo</Text>
           {unreadCount > 0 && (
             <View style={styles.unreadBadge}>
               <Text style={styles.unreadBadgeText}>{unreadCount}</Text>
@@ -391,7 +391,7 @@ const NotificationScreen = () => {
             onPress={markAllAsRead}
           >
             <Ionicons name="checkmark-done" size={16} color={COLORS.primary} />
-            <Text style={styles.markAllReadText}>{t('notifications.markAllRead')}</Text>
+            <Text style={styles.markAllReadText}>Đánh dấu tất cả đã đọc</Text>
           </TouchableOpacity>
         </View>
       )}
@@ -411,8 +411,8 @@ const NotificationScreen = () => {
             <View style={styles.emptyIconContainer}>
               <Ionicons name="notifications-outline" size={80} color={COLORS.gray400} />
             </View>
-            <Text style={styles.emptyTitle}>{t('notifications.empty')}</Text>
-            <Text style={styles.emptySubtitle}>{t('notifications.emptyDesc')}</Text>
+            <Text style={styles.emptyTitle}>Không có thông báo</Text>
+            <Text style={styles.emptySubtitle}>Khi có thông báo mới, chúng sẽ xuất hiện ở đây</Text>
           </View>
         )}
       </ScrollView>

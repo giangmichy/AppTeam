@@ -162,9 +162,9 @@ const LearningScreen = () => {
   const [showStats, setShowStats] = useState(false);
 
   const tabs = [
-    { key: 'all', label: t('learning.allCourses') },
-    { key: 'in_progress', label: t('learning.inProgress') },
-    { key: 'completed', label: t('learning.completed') }
+    { key: 'all', label: 'Tất cả khóa học' },
+    { key: 'in_progress', label: 'Đang học' },
+    { key: 'completed', label: 'Hoàn thành' }
   ];
 
   const getFilteredCourses = () => {
@@ -215,7 +215,7 @@ const LearningScreen = () => {
           <View style={styles.courseStat}>
             <Ionicons name="play-circle-outline" size={16} color={COLORS.textSecondary} />
             <Text style={styles.courseStatText}>
-              {item.completedLessons}/{item.totalLessons} {t('learning.lessons')}
+              {item.completedLessons}/{item.totalLessons} bài học
             </Text>
           </View>
           <View style={styles.courseStat}>
@@ -230,7 +230,7 @@ const LearningScreen = () => {
             onPress={() => navigation.navigate('Certificate' as any, { courseId: item.id })}
           >
             <Ionicons name="ribbon" size={16} color={COLORS.warning} />
-            <Text style={styles.certificateButtonText}>{t('learning.viewCertificate')}</Text>
+            <Text style={styles.certificateButtonText}>Xem chứng chỉ</Text>
           </TouchableOpacity>
         ) : (
           <TouchableOpacity
@@ -242,7 +242,7 @@ const LearningScreen = () => {
           >
             <Ionicons name="play" size={16} color={COLORS.white} />
             <Text style={styles.continueButtonText}>
-              {t('learning.continue')}: {item.nextLesson?.title}
+              Tiếp tục: {item.nextLesson?.title}
             </Text>
           </TouchableOpacity>
         )}
@@ -252,7 +252,7 @@ const LearningScreen = () => {
 
   const renderRecentActivity = () => (
     <View style={styles.activitySection}>
-      <Text style={styles.sectionTitle}>{t('learning.recentActivity')}</Text>
+      <Text style={styles.sectionTitle}>Hoạt động gần đây</Text>
       <View style={styles.activityList}>
         {mockRecentActivity.map((activity) => (
           <View key={activity.id} style={styles.activityItem}>
@@ -315,7 +315,7 @@ const LearningScreen = () => {
       >
         <SafeAreaView style={styles.modalContainer}>
           <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{t('learning.learningStats')}</Text>
+            <Text style={styles.modalTitle}>Thống kê học tập</Text>
             <TouchableOpacity onPress={() => setShowStats(false)}>
               <Ionicons name="close" size={24} color={COLORS.text} />
             </TouchableOpacity>
@@ -330,7 +330,7 @@ const LearningScreen = () => {
                 >
                   <Ionicons name="library" size={32} color={COLORS.white} />
                   <Text style={styles.statNumber}>{stats.totalCourses}</Text>
-                  <Text style={styles.statLabel}>{t('learning.totalCourses')}</Text>
+                  <Text style={styles.statLabel}>Tổng khóa học</Text>
                 </LinearGradient>
               </View>
 
@@ -341,7 +341,7 @@ const LearningScreen = () => {
                 >
                   <Ionicons name="checkmark-circle" size={32} color={COLORS.white} />
                   <Text style={styles.statNumber}>{stats.completedCourses}</Text>
-                  <Text style={styles.statLabel}>{t('learning.completed')}</Text>
+                  <Text style={styles.statLabel}>Hoàn thành</Text>
                 </LinearGradient>
               </View>
 
@@ -352,7 +352,7 @@ const LearningScreen = () => {
                 >
                   <Ionicons name="play-circle" size={32} color={COLORS.white} />
                   <Text style={styles.statNumber}>{stats.inProgressCourses}</Text>
-                  <Text style={styles.statLabel}>{t('learning.inProgress')}</Text>
+                  <Text style={styles.statLabel}>Đang học</Text>
                 </LinearGradient>
               </View>
 
@@ -363,13 +363,13 @@ const LearningScreen = () => {
                 >
                   <Ionicons name="time" size={32} color={COLORS.white} />
                   <Text style={styles.statNumber}>{Math.round(stats.totalWatchTime)}h</Text>
-                  <Text style={styles.statLabel}>{t('learning.watchTime')}</Text>
+                  <Text style={styles.statLabel}>Thời gian xem</Text>
                 </LinearGradient>
               </View>
             </View>
 
             <View style={styles.progressSection}>
-              <Text style={styles.progressSectionTitle}>{t('learning.courseProgress')}</Text>
+              <Text style={styles.progressSectionTitle}>Tiến độ khóa học</Text>
               {mockEnrolledCourses.filter(c => c.status === 'in_progress').map((course) => (
                 <View key={course.id} style={styles.progressItem}>
                   <Text style={styles.progressCourseTitle} numberOfLines={1}>
@@ -404,7 +404,7 @@ const LearningScreen = () => {
         >
           <Ionicons name="arrow-back" size={24} color={COLORS.text} />
         </TouchableOpacity>
-        <Text style={styles.headerTitle}>{t('learning.title')}</Text>
+        <Text style={styles.headerTitle}>Học tập</Text>
         <TouchableOpacity 
           style={styles.statsButton}
           onPress={() => setShowStats(true)}
@@ -422,20 +422,20 @@ const LearningScreen = () => {
           end={{ x: 1, y: 1 }}
         >
           <View style={styles.overviewContent}>
-            <Text style={styles.overviewTitle}>{t('learning.welcomeBack')}</Text>
-            <Text style={styles.overviewSubtitle}>{t('learning.continueJourney')}</Text>
+            <Text style={styles.overviewTitle}>Chào mừng trở lại!</Text>
+            <Text style={styles.overviewSubtitle}>Tiếp tục hành trình học tập của bạn</Text>
             
             <View style={styles.quickStats}>
               <View style={styles.quickStat}>
                 <Text style={styles.quickStatNumber}>{mockEnrolledCourses.length}</Text>
-                <Text style={styles.quickStatLabel}>{t('learning.enrolledCourses')}</Text>
+                <Text style={styles.quickStatLabel}>Khóa học đã đăng ký</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.quickStat}>
                 <Text style={styles.quickStatNumber}>
                   {mockEnrolledCourses.filter(c => c.status === 'completed').length}
                 </Text>
-                <Text style={styles.quickStatLabel}>{t('learning.completed')}</Text>
+                <Text style={styles.quickStatLabel}>Hoàn thành</Text>
               </View>
               <View style={styles.statDivider} />
               <View style={styles.quickStat}>
@@ -445,7 +445,7 @@ const LearningScreen = () => {
                     return total + duration;
                   }, 0))}h
                 </Text>
-                <Text style={styles.quickStatLabel}>{t('learning.totalHours')}</Text>
+                <Text style={styles.quickStatLabel}>Tổng thời gian</Text>
               </View>
             </View>
           </View>
@@ -498,8 +498,8 @@ const LearningScreen = () => {
             <View style={styles.emptyIconContainer}>
               <Ionicons name="school-outline" size={80} color={COLORS.gray400} />
             </View>
-            <Text style={styles.emptyTitle}>{t('learning.noCourses')}</Text>
-            <Text style={styles.emptySubtitle}>{t('learning.noCoursesDesc')}</Text>
+            <Text style={styles.emptyTitle}>Chưa có khóa học nào</Text>
+            <Text style={styles.emptySubtitle}>Hãy đăng ký khóa học đầu tiên để bắt đầu học tập</Text>
           </View>
         )}
 

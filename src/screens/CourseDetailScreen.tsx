@@ -460,7 +460,9 @@ const CourseDetailScreen = () => {
                     </View>
                     <View style={styles.lessonRight}>
                       {lesson.preview && (
-                        <Text style={styles.previewLabel}>{t('courseDetail.preview')}</Text>
+                        <View style={styles.previewBadge}>
+                          <Text style={styles.previewBadgeText}>{t('courseDetail.preview')}</Text>
+                        </View>
                       )}
                       <Text style={styles.lessonDuration}>{lesson.duration}</Text>
                     </View>
@@ -958,11 +960,14 @@ const styles = StyleSheet.create({
   },
   actionButtons: {
     flexDirection: 'row',
-    gap: 12,
+    gap: 10,
     marginBottom: 16,
   },
   addToCartButton: {
     flex: 1,
+    backgroundColor: COLORS.white,
+    borderWidth: 3,
+    borderColor: COLORS.primary,
   },
   favoriteButton: {
     width: 48,
@@ -970,6 +975,7 @@ const styles = StyleSheet.create({
     borderRadius: 8,
     borderWidth: 2,
     borderColor: COLORS.border,
+    backgroundColor: COLORS.white,
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -1092,6 +1098,18 @@ const styles = StyleSheet.create({
   lessonDuration: {
     fontSize: 13,
     color: COLORS.textSecondary,
+  },
+  previewBadge: {
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+    borderRadius: 4,
+    marginRight: 8,
+  },
+  previewBadgeText: {
+    fontSize: 10,
+    color: COLORS.white,
+    fontWeight: '600',
   },
 
   // Requirements Section
