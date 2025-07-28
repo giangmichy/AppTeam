@@ -14,6 +14,12 @@ import AccountScreen from "../screens/AccountScreen";
 import NotificationScreen from "../screens/NotificationScreen";
 import LearningScreen from "../screens/LearningScreen";
 import FavoritesScreen from "../screens/FavoritesScreen";
+import VideoPlayerScreen from "../screens/VideoPlayerScreen";
+import CertificateScreen from "../screens/CertificateScreen";
+import CheckoutScreen from "../screens/CheckoutScreen";
+import PaymentScreen from "../screens/PaymentScreen";
+import EditProfileScreen from "../screens/EditProfileScreen";
+import SearchResultsScreen from "../screens/SearchResultsScreen";
 
 export type RootStackParamList = {
   Home: undefined;
@@ -29,8 +35,12 @@ export type RootStackParamList = {
   Notification: undefined;
   Learning: undefined;
   Favorites: undefined;
-  VideoPlayer: { videoUrl: string; title: string };
+  VideoPlayer: { videoUrl: string; title: string; courseId?: string; lessonId?: string };
   Certificate: { courseId: string };
+  Checkout: undefined;
+  Payment: { orderData: any };
+  EditProfile: undefined;
+  SearchResults: { query?: string; category?: string };
 };
 
 const Stack = createNativeStackNavigator<RootStackParamList>();
@@ -100,6 +110,55 @@ const AppNavigator = () => (
       <Stack.Screen 
         name="Favorites" 
         component={FavoritesScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="VideoPlayer" 
+        component={VideoPlayerScreen}
+        options={{
+          presentation: 'fullScreenModal',
+          gestureEnabled: true,
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen 
+        name="Certificate" 
+        component={CertificateScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="Checkout" 
+        component={CheckoutScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="Payment" 
+        component={PaymentScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: false, // Prevent accidental back during payment
+        }}
+      />
+      <Stack.Screen 
+        name="EditProfile" 
+        component={EditProfileScreen}
+        options={{
+          presentation: 'card',
+          gestureEnabled: true,
+        }}
+      />
+      <Stack.Screen 
+        name="SearchResults" 
+        component={SearchResultsScreen}
         options={{
           presentation: 'card',
           gestureEnabled: true,
