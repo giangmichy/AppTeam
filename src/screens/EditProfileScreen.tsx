@@ -14,7 +14,6 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LinearGradient } from 'expo-linear-gradient';
 import { useTranslation } from 'react-i18next';
 import CustomInput from '../components/CustomInput';
 import CustomButton from '../components/CustomButton';
@@ -129,12 +128,7 @@ const EditProfileScreen = () => {
 
   const renderAvatarSection = () => (
     <View style={styles.avatarSection}>
-      <LinearGradient
-        colors={[COLORS.primary, COLORS.primaryLight]}
-        style={styles.avatarGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
-      >
+      <View style={styles.avatarGradient}>
         <TouchableOpacity 
           style={styles.avatarContainer}
           onPress={handleAvatarChange}
@@ -152,7 +146,7 @@ const EditProfileScreen = () => {
         </TouchableOpacity>
         
         <Text style={styles.avatarHint}>Nhấn để thay đổi ảnh đại diện</Text>
-      </LinearGradient>
+      </View>
     </View>
   );
 
@@ -231,7 +225,7 @@ const EditProfileScreen = () => {
         value={userInfo.website}
         onChangeText={(text) => setUserInfo({...userInfo, website: text})}
         placeholder="https://example.com"
-        keyboardType="url"
+        keyboardType="default"  
         leftIcon="globe-outline"
       />
     </View>
@@ -521,6 +515,7 @@ const styles = StyleSheet.create({
     paddingVertical: 24,
     paddingHorizontal: 32,
     borderRadius: 20,
+    backgroundColor: COLORS.primary,
   },
   avatarContainer: {
     position: 'relative',

@@ -31,6 +31,7 @@ export type RootStackParamList = {
   Notification: undefined;
   Learning: undefined;
   Favorites: undefined;
+  SearchResults: { query?: string; category?: string };
 };
 type HomeScreenNavigationProp = NativeStackNavigationProp<
   RootStackParamList,
@@ -438,7 +439,11 @@ const HomeScreen = () => {
   );
 
   const renderCategoryChip = (category: string, index: number) => (
-    <TouchableOpacity key={index} style={styles.categoryChip}>
+    <TouchableOpacity 
+      key={index} 
+      style={styles.categoryChip}
+      onPress={() => navigation.navigate('SearchResults', { category })}
+    >
       <Text style={styles.categoryChipText}>{category}</Text>
     </TouchableOpacity>
   );
@@ -500,7 +505,7 @@ const HomeScreen = () => {
                 ]}
                 onPress={() => {
                   setShowCategoriesModal(false);
-                  // Navigate to category screen
+                  navigation.navigate('SearchResults', { category: category.name });
                 }}
               >
                 <View
@@ -583,7 +588,10 @@ const HomeScreen = () => {
       >
         {/* Search Bar */}
         <View style={styles.searchContainer}>
-          <View style={styles.searchBar}>
+          <TouchableOpacity 
+            style={styles.searchBar}
+            onPress={() => navigation.navigate('SearchResults', { query: searchText })}
+          >
             <Ionicons name="search-outline" size={20} color={COLORS.gray400} />
             <TextInput
               style={styles.searchInput}
@@ -591,8 +599,9 @@ const HomeScreen = () => {
               value={searchText}
               onChangeText={setSearchText}
               placeholderTextColor={COLORS.gray400}
+              editable={false}
             />
-          </View>
+          </TouchableOpacity>
         </View>
 
         {/* Categories */}

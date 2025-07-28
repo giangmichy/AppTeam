@@ -15,7 +15,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useNavigation } from '@react-navigation/native';
 import { NativeStackNavigationProp } from '@react-navigation/native-stack';
-import { LinearGradient } from 'expo-linear-gradient';
+
 import { useTranslation } from 'react-i18next';
 import CustomButton from '../components/CustomButton';
 import { COLORS } from '../constants/colors';
@@ -61,7 +61,7 @@ const AccountScreen = () => {
   const [darkModeEnabled, setDarkModeEnabled] = useState(false);
 
   const handleEditProfile = () => {
-    Alert.alert('Chỉnh sửa hồ sơ', 'Tính năng đang phát triển');
+    navigation.navigate('EditProfile');
   };
 
   const handleBecomeInstructor = () => {
@@ -196,11 +196,8 @@ const AccountScreen = () => {
 
   const renderUserInfo = () => (
     <View style={styles.userInfoContainer}>
-      <LinearGradient
-        colors={[COLORS.primary, COLORS.primaryLight]}
+      <View
         style={styles.userGradient}
-        start={{ x: 0, y: 0 }}
-        end={{ x: 1, y: 1 }}
       >
         <View style={styles.userHeader}>
           <TouchableOpacity style={styles.avatarContainer} onPress={handleEditProfile}>
@@ -245,7 +242,7 @@ const AccountScreen = () => {
             <Text style={styles.statLabel}>Điểm</Text>
           </View>
         </View>
-      </LinearGradient>
+      </View>
     </View>
   );
 
@@ -441,6 +438,7 @@ const styles = StyleSheet.create({
   userGradient: {
     borderRadius: 16,
     padding: 20,
+    backgroundColor: COLORS.primary,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.15,

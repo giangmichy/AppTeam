@@ -9,6 +9,7 @@ import {
   StatusBar,
   TextInput,
   Modal,
+  ScrollView, // ✅ Thêm ScrollView import
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -151,7 +152,7 @@ const SearchResultsScreen = () => {
   const route = useRoute();
   const { t } = useTranslation();
   
-  const { query: initialQuery = '', category: initialCategory = '' } = route.params || {};
+  const { query: initialQuery = '', category: initialCategory = '' } = route.params as { query?: string; category?: string } || {};
   
   const [searchQuery, setSearchQuery] = useState(initialQuery);
   const [results, setResults] = useState(mockSearchResults);
