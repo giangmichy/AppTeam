@@ -11,6 +11,7 @@ import {
   TextInput,
   Alert,
   Animated,
+  FlatList,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
@@ -29,7 +30,81 @@ type RootStackParamList = {
 
 type VideoPlayerScreenNavigationProp = NativeStackNavigationProp<RootStackParamList, 'VideoPlayer'>;
 
-// Mock video data
+// Mock quiz data
+const mockQuizData = {
+  id: 'quiz-1',
+  title: 'Kiểm tra kiến thức - Biến và Kiểu dữ liệu Python',
+  description: 'Hãy kiểm tra hiểu biết của bạn về những khái niệm vừa học',
+  questions: [
+    {
+      id: 'q1',
+      question: 'Biến trong Python được khai báo như thế nào?',
+      type: 'multiple-choice',
+      options: [
+        'var x = 10',
+        'int x = 10', 
+        'x = 10',
+        'declare x = 10'
+      ],
+      correctAnswer: 2,
+      explanation: 'Python không cần từ khóa khai báo biến, chỉ cần gán giá trị trực tiếp.'
+    },
+    {
+      id: 'q2',
+      question: 'Kiểu dữ liệu nào sau đây KHÔNG phải là kiểu cơ bản trong Python?',
+      type: 'multiple-choice',
+      options: [
+        'int',
+        'string',
+        'boolean', 
+        'array'
+      ],
+      correctAnswer: 3,
+      explanation: 'Python sử dụng list thay vì array. Array là khái niệm trong các ngôn ngữ khác.'
+    },
+    {
+      id: 'q3',
+      question: 'Hàm type() trong Python dùng để làm gì?',
+      type: 'multiple-choice',
+      options: [
+        'Chuyển đổi kiểu dữ liệu',
+        'Kiểm tra kiểu dữ liệu của biến',
+        'Xóa biến',
+        'Tạo biến mới'
+      ],
+      correctAnswer: 1,
+      explanation: 'Hàm type() trả về kiểu dữ liệu của một biến hoặc giá trị.'
+    },
+    {
+      id: 'q4',
+      question: 'Chuỗi "Hello World" trong Python thuộc kiểu dữ liệu nào?',
+      type: 'multiple-choice',
+      options: [
+        'str',
+        'string',
+        'text',
+        'char'
+      ],
+      correctAnswer: 0,
+      explanation: 'Trong Python, chuỗi ký tự có kiểu dữ liệu là str (string).'
+    },
+    {
+      id: 'q5',
+      question: 'Giá trị nào sau đây là Boolean trong Python?',
+      type: 'multiple-choice',
+      options: [
+        'true/false',
+        'True/False',
+        '1/0',
+        'yes/no'
+      ],
+      correctAnswer: 1,
+      explanation: 'Python sử dụng True và False (viết hoa chữ cái đầu) cho kiểu Boolean.'
+    }
+  ]
+};
+
+// Mock video data  
 const mockVideoData = {
   id: 'lesson-1',
   title: 'Giới thiệu về Python - Biến và Kiểu dữ liệu',
@@ -62,6 +137,22 @@ const mockVideoData = {
       content: 'Nhớ cài đặt Python 3.8 trở lên',
       timestamp: '06:20'
     }
+  ],
+  hasQuiz: true,
+  quizUnlocked: false // Quiz sẽ unlock khi xem hết video
+};
+
+// Mock learning progress data
+const mockLearningProgress = {
+  totalLessons: 45,
+  completedLessons: 12,
+  currentStreak: 7,
+  totalStudyTime: 142, // minutes
+  weeklyGoal: 300, // minutes
+  achievements: [
+    { id: 1, title: 'First Video', icon: 'play-circle', unlocked: true },
+    { id: 2, title: 'Quiz Master', icon: 'trophy', unlocked: false },
+    { id: 3, title: '7 Day Streak', icon: 'flame', unlocked: true },
   ]
 };
 
@@ -82,8 +173,15 @@ const VideoPlayerScreen = () => {
   const [showQualityModal, setShowQualityModal] = useState(false);
   const [showNotesModal, setShowNotesModal] = useState(false);
   const [showChaptersModal, setShowChaptersModal] = useState(false);
+  const [showQuizModal, setShowQuizModal] = useState(false);
   const [newNote, setNewNote] = useState('');
   const [notes, setNotes] = useState(mockVideoData.notes);
+  
+  // Quiz states
+  const [currentQuestionIndex, setCurrentQuestionIndex] = useState(0);
+  const [selectedAnswers, setSelectedAnswers] = useState<{[key: string]: number}>({});
+  const [showQuizResults, setShowQuizResults] = useState(false);
+  const [quizCompleted, setQuizCompleted] = useState(false);
 
   const controlsOpacity = useRef(new Animated.Value(1)).current;
   const progressRef = useRef<View>(null);
@@ -91,7 +189,14 @@ const VideoPlayerScreen = () => {
   useEffect(() => {
     const timer = setInterval(() => {
       if (isPlaying) {
-        setCurrentTime(prev => Math.min(prev + 1, duration));
+        setCurrentTime(prev => {
+          const newTime = Math.min(prev + 1, duration);
+          // Unlock quiz when video is 80% completed
+          if (newTime >= duration * 0.8) {
+            mockVideoData.quizUnlocked = true;
+          }
+          return newTime;
+        });
       }
     }, 1000);
 
@@ -181,6 +286,65 @@ const VideoPlayerScreen = () => {
   const jumpToChapter = (startTime: number) => {
     setCurrentTime(startTime);
     setShowChaptersModal(false);
+  };
+
+  // Quiz functions
+  const startQuiz = () => {
+    if (!mockVideoData.quizUnlocked) {
+      Alert.alert('Quiz chưa mở khóa', 'Hãy xem hết video để mở khóa bài quiz này');
+      return;
+    }
+    setCurrentQuestionIndex(0);
+    setSelectedAnswers({});
+    setShowQuizResults(false);
+    setQuizCompleted(false);
+    setShowQuizModal(true);
+  };
+
+  const selectAnswer = (questionId: string, answerIndex: number) => {
+    setSelectedAnswers(prev => ({
+      ...prev,
+      [questionId]: answerIndex
+    }));
+  };
+
+  const nextQuestion = () => {
+    if (currentQuestionIndex < mockQuizData.questions.length - 1) {
+      setCurrentQuestionIndex(prev => prev + 1);
+    } else {
+      finishQuiz();
+    }
+  };
+
+  const previousQuestion = () => {
+    if (currentQuestionIndex > 0) {
+      setCurrentQuestionIndex(prev => prev - 1);
+    }
+  };
+
+  const finishQuiz = () => {
+    setShowQuizResults(true);
+    setQuizCompleted(true);
+  };
+
+  const calculateQuizScore = () => {
+    let correct = 0;
+    mockQuizData.questions.forEach(question => {
+      if (selectedAnswers[question.id] === question.correctAnswer) {
+        correct++;
+      }
+    });
+    return {
+      correct,
+      total: mockQuizData.questions.length,
+      percentage: Math.round((correct / mockQuizData.questions.length) * 100)
+    };
+  };
+
+  const getScoreColor = (percentage: number) => {
+    if (percentage >= 80) return COLORS.success;
+    if (percentage >= 60) return COLORS.warning;
+    return COLORS.danger;
   };
 
   const playbackSpeeds = [0.5, 0.75, 1, 1.25, 1.5, 2];
@@ -324,34 +488,366 @@ const VideoPlayerScreen = () => {
   );
 
   const renderBottomActions = () => (
-    <View style={styles.bottomActions}>
-      <TouchableOpacity 
-        style={styles.actionButton}
-        onPress={() => setShowNotesModal(true)}
-      >
-        <Ionicons name="document-text" size={20} color={COLORS.primary} />
-        <Text style={styles.actionButtonText}>Ghi chú ({notes.length})</Text>
-      </TouchableOpacity>
+    <View style={styles.bottomSection}>
+      {/* Action Buttons */}
+      <View style={styles.bottomActions}>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => setShowNotesModal(true)}
+        >
+          <Ionicons name="document-text" size={20} color={COLORS.primary} />
+          <Text style={styles.actionButtonText}>Ghi chú ({notes.length})</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity 
-        style={styles.actionButton}
-        onPress={() => setShowChaptersModal(true)}
-      >
-        <Ionicons name="list" size={20} color={COLORS.primary} />
-        <Text style={styles.actionButtonText}>Chương</Text>
-      </TouchableOpacity>
+        <TouchableOpacity 
+          style={styles.actionButton}
+          onPress={() => setShowChaptersModal(true)}
+        >
+          <Ionicons name="list" size={20} color={COLORS.primary} />
+          <Text style={styles.actionButtonText}>Chương</Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButton}>
-        <Ionicons name="download" size={20} color={COLORS.primary} />
-        <Text style={styles.actionButtonText}>Tải xuống</Text>
-      </TouchableOpacity>
+        <TouchableOpacity 
+          style={[styles.actionButton, !mockVideoData.quizUnlocked && styles.actionButtonDisabled]}
+          onPress={startQuiz}
+        >
+          <Ionicons 
+            name="help-circle" 
+            size={20} 
+            color={mockVideoData.quizUnlocked ? COLORS.accent : COLORS.gray400} 
+          />
+          <Text style={[
+            styles.actionButtonText, 
+            { color: mockVideoData.quizUnlocked ? COLORS.accent : COLORS.gray400 }
+          ]}>
+            Quiz {!mockVideoData.quizUnlocked && '🔒'}
+          </Text>
+        </TouchableOpacity>
 
-      <TouchableOpacity style={styles.actionButton}>
-        <Ionicons name="share" size={20} color={COLORS.primary} />
-        <Text style={styles.actionButtonText}>Chia sẻ</Text>
-      </TouchableOpacity>
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="download" size={20} color={COLORS.primary} />
+          <Text style={styles.actionButtonText}>Tải xuống</Text>
+        </TouchableOpacity>
+
+        <TouchableOpacity style={styles.actionButton}>
+          <Ionicons name="share" size={20} color={COLORS.primary} />
+          <Text style={styles.actionButtonText}>Chia sẻ</Text>
+        </TouchableOpacity>
+      </View>
+
+      {/* Learning Progress Section */}
+      <View style={styles.progressSection}>
+        <LinearGradient
+          colors={[COLORS.primary, COLORS.primaryLight]}
+          style={styles.progressGradient}
+          start={{ x: 0, y: 0 }}
+          end={{ x: 1, y: 1 }}
+        >
+          <View style={styles.progressHeader}>
+            <Text style={styles.progressTitle}>Tiến độ học tập</Text>
+            <View style={styles.streakBadge}>
+              <Ionicons name="flame" size={16} color={COLORS.warning} />
+              <Text style={styles.streakText}>{mockLearningProgress.currentStreak} ngày</Text>
+            </View>
+          </View>
+
+          <View style={styles.progressStats}>
+            <View style={styles.progressStat}>
+              <Text style={styles.progressStatNumber}>
+                {mockLearningProgress.completedLessons}/{mockLearningProgress.totalLessons}
+              </Text>
+              <Text style={styles.progressStatLabel}>Bài học</Text>
+            </View>
+
+            <View style={styles.progressStat}>
+              <Text style={styles.progressStatNumber}>
+                {mockLearningProgress.totalStudyTime}
+              </Text>
+              <Text style={styles.progressStatLabel}>Phút học</Text>
+            </View>
+
+            <View style={styles.progressStat}>
+              <Text style={styles.progressStatNumber}>
+                {Math.round((mockLearningProgress.totalStudyTime / mockLearningProgress.weeklyGoal) * 100)}%
+              </Text>
+              <Text style={styles.progressStatLabel}>Mục tiêu tuần</Text>
+            </View>
+          </View>
+
+          <View style={styles.weeklyGoalProgress}>
+            <Text style={styles.weeklyGoalText}>Mục tiêu tuần này</Text>
+            <View style={styles.weeklyGoalBar}>
+              <View 
+                style={[
+                  styles.weeklyGoalFill, 
+                  { width: `${Math.min((mockLearningProgress.totalStudyTime / mockLearningProgress.weeklyGoal) * 100, 100)}%` }
+                ]} 
+              />
+            </View>
+            <Text style={styles.weeklyGoalLabel}>
+              {mockLearningProgress.totalStudyTime}/{mockLearningProgress.weeklyGoal} phút
+            </Text>
+          </View>
+        </LinearGradient>
+      </View>
+
+      {/* Achievements Section */}
+      <View style={styles.achievementsSection}>
+        <Text style={styles.achievementsTitle}>Thành tích</Text>
+        <View style={styles.achievementsList}>
+          {mockLearningProgress.achievements.map((achievement) => (
+            <View 
+              key={achievement.id} 
+              style={[
+                styles.achievementItem,
+                achievement.unlocked && styles.achievementUnlocked
+              ]}
+            >
+              <LinearGradient
+                colors={achievement.unlocked ? [COLORS.warning, '#D97706'] : [COLORS.gray300, COLORS.gray400]}
+                style={styles.achievementIcon}
+              >
+                <Ionicons 
+                  name={achievement.icon as any} 
+                  size={20} 
+                  color={COLORS.white} 
+                />
+              </LinearGradient>
+              <Text style={[
+                styles.achievementTitle,
+                !achievement.unlocked && styles.achievementTitleLocked
+              ]}>
+                {achievement.title}
+              </Text>
+            </View>
+          ))}
+        </View>
+      </View>
     </View>
   );
+
+  // Quiz Modal
+  const renderQuizModal = () => {
+    if (!showQuizModal) return null;
+
+    const currentQuestion = mockQuizData.questions[currentQuestionIndex];
+    const isLastQuestion = currentQuestionIndex === mockQuizData.questions.length - 1;
+    const hasSelectedAnswer = selectedAnswers[currentQuestion.id] !== undefined;
+
+    if (showQuizResults) {
+      const score = calculateQuizScore();
+      return (
+        <Modal
+          visible={showQuizModal}
+          animationType="slide"
+          presentationStyle="fullScreen"
+          onRequestClose={() => setShowQuizModal(false)}
+        >
+          <LinearGradient
+            colors={[COLORS.primary, COLORS.primaryDark]}
+            style={styles.quizResultsContainer}
+          >
+            <SafeAreaView style={styles.quizResultsContent}>
+              <View style={styles.quizResultsHeader}>
+                <TouchableOpacity onPress={() => setShowQuizModal(false)}>
+                  <Ionicons name="close" size={24} color={COLORS.white} />
+                </TouchableOpacity>
+              </View>
+
+              <View style={styles.quizResultsBody}>
+                <View style={styles.scoreCircle}>
+                  <LinearGradient
+                    colors={[getScoreColor(score.percentage), getScoreColor(score.percentage) + '80']}
+                    style={styles.scoreGradient}
+                  >
+                    <Text style={styles.scorePercentage}>{score.percentage}%</Text>
+                    <Text style={styles.scoreLabel}>Điểm số</Text>
+                  </LinearGradient>
+                </View>
+
+                <Text style={styles.scoreTitle}>
+                  {score.percentage >= 80 ? 'Xuất sắc! 🎉' : 
+                   score.percentage >= 60 ? 'Tốt! 👍' : 'Cần cải thiện 📚'}
+                </Text>
+
+                <Text style={styles.scoreDescription}>
+                  Bạn đã trả lời đúng {score.correct}/{score.total} câu hỏi
+                </Text>
+
+                <View style={styles.quizActions}>
+                  <TouchableOpacity 
+                    style={styles.reviewButton}
+                    onPress={() => {
+                      setShowQuizResults(false);
+                      setCurrentQuestionIndex(0);
+                    }}
+                  >
+                    <Ionicons name="eye" size={20} color={COLORS.primary} />
+                    <Text style={styles.reviewButtonText}>Xem lại đáp án</Text>
+                  </TouchableOpacity>
+
+                  <TouchableOpacity 
+                    style={styles.retakeButton}
+                    onPress={() => {
+                      setSelectedAnswers({});
+                      setShowQuizResults(false);
+                      setCurrentQuestionIndex(0);
+                    }}
+                  >
+                    <Ionicons name="refresh" size={20} color={COLORS.white} />
+                    <Text style={styles.retakeButtonText}>Làm lại</Text>
+                  </TouchableOpacity>
+                </View>
+              </View>
+            </SafeAreaView>
+          </LinearGradient>
+        </Modal>
+      );
+    }
+
+    return (
+      <Modal
+        visible={showQuizModal}
+        animationType="slide"
+        presentationStyle="fullScreen"
+        onRequestClose={() => setShowQuizModal(false)}
+      >
+        <SafeAreaView style={styles.quizContainer}>
+          <View style={styles.quizHeader}>
+            <TouchableOpacity onPress={() => setShowQuizModal(false)}>
+              <Ionicons name="close" size={24} color={COLORS.text} />
+            </TouchableOpacity>
+            
+            <View style={styles.quizProgress}>
+              <Text style={styles.quizProgressText}>
+                {currentQuestionIndex + 1}/{mockQuizData.questions.length}
+              </Text>
+              <View style={styles.quizProgressBar}>
+                <View 
+                  style={[
+                    styles.quizProgressFill, 
+                    { width: `${((currentQuestionIndex + 1) / mockQuizData.questions.length) * 100}%` }
+                  ]} 
+                />
+              </View>
+            </View>
+
+            <View style={styles.quizHeaderPlaceholder} />
+          </View>
+
+          <ScrollView style={styles.quizContent}>
+            <View style={styles.questionContainer}>
+              <Text style={styles.questionTitle}>Câu hỏi {currentQuestionIndex + 1}</Text>
+              <Text style={styles.questionText}>{currentQuestion.question}</Text>
+            </View>
+
+            <View style={styles.optionsContainer}>
+              {currentQuestion.options.map((option, index) => {
+                const isSelected = selectedAnswers[currentQuestion.id] === index;
+                const isCorrect = index === currentQuestion.correctAnswer;
+                const showResults = quizCompleted || showQuizResults;
+                
+                return (
+                  <TouchableOpacity
+                    key={index}
+                    style={[
+                      styles.optionButton,
+                      isSelected && styles.optionSelected,
+                      showResults && isCorrect && styles.optionCorrect,
+                      showResults && isSelected && !isCorrect && styles.optionIncorrect
+                    ]}
+                    onPress={() => !showResults && selectAnswer(currentQuestion.id, index)}
+                    disabled={showResults}
+                  >
+                    <View style={styles.optionContent}>
+                      <View style={[
+                        styles.optionIndicator,
+                        isSelected && styles.optionIndicatorSelected,
+                        showResults && isCorrect && styles.optionIndicatorCorrect,
+                        showResults && isSelected && !isCorrect && styles.optionIndicatorIncorrect
+                      ]}>
+                        {showResults ? (
+                          isCorrect ? (
+                            <Ionicons name="checkmark" size={16} color={COLORS.white} />
+                          ) : isSelected ? (
+                            <Ionicons name="close" size={16} color={COLORS.white} />
+                          ) : (
+                            <Text style={styles.optionLetter}>{String.fromCharCode(65 + index)}</Text>
+                          )
+                        ) : (
+                          <Text style={[
+                            styles.optionLetter,
+                            isSelected && styles.optionLetterSelected
+                          ]}>
+                            {String.fromCharCode(65 + index)}
+                          </Text>
+                        )}
+                      </View>
+                      <Text style={[
+                        styles.optionText,
+                        isSelected && styles.optionTextSelected,
+                        showResults && isCorrect && styles.optionTextCorrect,
+                        showResults && isSelected && !isCorrect && styles.optionTextIncorrect
+                      ]}>
+                        {option}
+                      </Text>
+                    </View>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            {showResults && (
+              <View style={styles.explanationContainer}>
+                <View style={styles.explanationHeader}>
+                  <Ionicons name="bulb" size={20} color={COLORS.warning} />
+                  <Text style={styles.explanationTitle}>Giải thích</Text>
+                </View>
+                <Text style={styles.explanationText}>{currentQuestion.explanation}</Text>
+              </View>
+            )}
+          </ScrollView>
+
+          <View style={styles.quizFooter}>
+            <TouchableOpacity 
+              style={[styles.quizNavButton, currentQuestionIndex === 0 && styles.quizNavButtonDisabled]}
+              onPress={previousQuestion}
+              disabled={currentQuestionIndex === 0}
+            >
+              <Ionicons name="chevron-back" size={20} color={currentQuestionIndex === 0 ? COLORS.gray400 : COLORS.primary} />
+              <Text style={[
+                styles.quizNavButtonText,
+                currentQuestionIndex === 0 && styles.quizNavButtonTextDisabled
+              ]}>
+                Trước
+              </Text>
+            </TouchableOpacity>
+
+            <TouchableOpacity 
+              style={[
+                styles.quizSubmitButton,
+                !hasSelectedAnswer && styles.quizSubmitButtonDisabled
+              ]}
+              onPress={nextQuestion}
+              disabled={!hasSelectedAnswer}
+            >
+              <Text style={[
+                styles.quizSubmitButtonText,
+                !hasSelectedAnswer && styles.quizSubmitButtonTextDisabled
+              ]}>
+                {isLastQuestion ? 'Hoàn thành' : 'Tiếp theo'}
+              </Text>
+              <Ionicons 
+                name={isLastQuestion ? "checkmark" : "chevron-forward"} 
+                size={20} 
+                color={hasSelectedAnswer ? COLORS.white : COLORS.gray400} 
+              />
+            </TouchableOpacity>
+          </View>
+        </SafeAreaView>
+      </Modal>
+    );
+  };
 
   // Speed Modal
   const renderSpeedModal = () => (
@@ -568,6 +1064,7 @@ const VideoPlayerScreen = () => {
       
       {!isFullscreen && renderBottomActions()}
       
+      {renderQuizModal()}
       {renderSpeedModal()}
       {renderQualityModal()}
       {renderNotesModal()}
@@ -579,7 +1076,7 @@ const VideoPlayerScreen = () => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: COLORS.black,
+    backgroundColor: COLORS.background,
   },
   videoContainer: {
     width: width,
@@ -719,6 +1216,12 @@ const styles = StyleSheet.create({
     fontSize: 12,
     fontWeight: '600',
   },
+
+  // Bottom Section
+  bottomSection: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
   bottomActions: {
     flexDirection: 'row',
     backgroundColor: COLORS.white,
@@ -727,16 +1230,451 @@ const styles = StyleSheet.create({
     justifyContent: 'space-around',
     borderTopWidth: 1,
     borderTopColor: COLORS.border,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: -2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 4,
+    elevation: 4,
   },
   actionButton: {
     alignItems: 'center',
     gap: 8,
+    paddingVertical: 8,
+    paddingHorizontal: 4,
+  },
+  actionButtonDisabled: {
+    opacity: 0.5,
   },
   actionButtonText: {
     fontSize: 12,
     color: COLORS.primary,
     fontWeight: '500',
+    textAlign: 'center',
   },
+
+  // Progress Section
+  progressSection: {
+    margin: 16,
+    borderRadius: 16,
+    overflow: 'hidden',
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.15,
+    shadowRadius: 12,
+    elevation: 8,
+  },
+  progressGradient: {
+    padding: 20,
+  },
+  progressHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    marginBottom: 16,
+  },
+  progressTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
+  streakBadge: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 12,
+    paddingVertical: 6,
+    borderRadius: 16,
+    gap: 6,
+  },
+  streakText: {
+    color: COLORS.white,
+    fontSize: 12,
+    fontWeight: '600',
+  },
+  progressStats: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+    marginBottom: 20,
+  },
+  progressStat: {
+    alignItems: 'center',
+  },
+  progressStatNumber: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.white,
+    marginBottom: 4,
+  },
+  progressStatLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+  weeklyGoalProgress: {
+    alignItems: 'center',
+  },
+  weeklyGoalText: {
+    fontSize: 14,
+    color: 'rgba(255,255,255,0.9)',
+    marginBottom: 8,
+  },
+  weeklyGoalBar: {
+    width: '100%',
+    height: 8,
+    backgroundColor: 'rgba(255,255,255,0.3)',
+    borderRadius: 4,
+    overflow: 'hidden',
+    marginBottom: 8,
+  },
+  weeklyGoalFill: {
+    height: '100%',
+    backgroundColor: COLORS.warning,
+    borderRadius: 4,
+  },
+  weeklyGoalLabel: {
+    fontSize: 12,
+    color: 'rgba(255,255,255,0.8)',
+  },
+
+  // Achievements Section
+  achievementsSection: {
+    backgroundColor: COLORS.white,
+    margin: 16,
+    borderRadius: 16,
+    padding: 20,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 8,
+    elevation: 4,
+  },
+  achievementsTitle: {
+    fontSize: 18,
+    fontWeight: 'bold',
+    color: COLORS.text,
+    marginBottom: 16,
+  },
+  achievementsList: {
+    flexDirection: 'row',
+    justifyContent: 'space-around',
+  },
+  achievementItem: {
+    alignItems: 'center',
+    gap: 8,
+    opacity: 0.5,
+  },
+  achievementUnlocked: {
+    opacity: 1,
+  },
+  achievementIcon: {
+    width: 48,
+    height: 48,
+    borderRadius: 24,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  achievementTitle: {
+    fontSize: 12,
+    color: COLORS.text,
+    fontWeight: '500',
+    textAlign: 'center',
+  },
+  achievementTitleLocked: {
+    color: COLORS.gray400,
+  },
+
+  // Quiz Styles
+  quizContainer: {
+    flex: 1,
+    backgroundColor: COLORS.background,
+  },
+  quizHeader: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: COLORS.white,
+    borderBottomWidth: 1,
+    borderBottomColor: COLORS.border,
+  },
+  quizProgress: {
+    flex: 1,
+    alignItems: 'center',
+    marginHorizontal: 20,
+  },
+  quizProgressText: {
+    fontSize: 14,
+    fontWeight: '600',
+    color: COLORS.text,
+    marginBottom: 8,
+  },
+  quizProgressBar: {
+    width: '100%',
+    height: 4,
+    backgroundColor: COLORS.gray200,
+    borderRadius: 2,
+    overflow: 'hidden',
+  },
+  quizProgressFill: {
+    height: '100%',
+    backgroundColor: COLORS.primary,
+    borderRadius: 2,
+  },
+  quizHeaderPlaceholder: {
+    width: 24,
+  },
+  quizContent: {
+    flex: 1,
+    padding: 20,
+  },
+  questionContainer: {
+    marginBottom: 24,
+  },
+  questionTitle: {
+    fontSize: 16,
+    fontWeight: 'bold',
+    color: COLORS.primary,
+    marginBottom: 12,
+  },
+  questionText: {
+    fontSize: 18,
+    fontWeight: '600',
+    color: COLORS.text,
+    lineHeight: 26,
+  },
+  optionsContainer: {
+    gap: 12,
+  },
+  optionButton: {
+    borderWidth: 2,
+    borderColor: COLORS.border,
+    borderRadius: 12,
+    backgroundColor: COLORS.white,
+    overflow: 'hidden',
+  },
+  optionSelected: {
+    borderColor: COLORS.primary,
+    backgroundColor: COLORS.primary + '05',
+  },
+  optionCorrect: {
+    borderColor: COLORS.success,
+    backgroundColor: COLORS.success + '05',
+  },
+  optionIncorrect: {
+    borderColor: COLORS.danger,
+    backgroundColor: COLORS.danger + '05',
+  },
+  optionContent: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    padding: 16,
+    gap: 12,
+  },
+  optionIndicator: {
+    width: 32,
+    height: 32,
+    borderRadius: 16,
+    backgroundColor: COLORS.gray200,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  optionIndicatorSelected: {
+    backgroundColor: COLORS.primary,
+  },
+  optionIndicatorCorrect: {
+    backgroundColor: COLORS.success,
+  },
+  optionIndicatorIncorrect: {
+    backgroundColor: COLORS.danger,
+  },
+  optionLetter: {
+    fontSize: 14,
+    fontWeight: 'bold',
+    color: COLORS.gray600,
+  },
+  optionLetterSelected: {
+    color: COLORS.white,
+  },
+  optionText: {
+    flex: 1,
+    fontSize: 16,
+    color: COLORS.text,
+    fontWeight: '500',
+  },
+  optionTextSelected: {
+    color: COLORS.primary,
+    fontWeight: '600',
+  },
+  optionTextCorrect: {
+    color: COLORS.success,
+    fontWeight: '600',
+  },
+  optionTextIncorrect: {
+    color: COLORS.danger,
+    fontWeight: '600',
+  },
+  explanationContainer: {
+    marginTop: 24,
+    padding: 16,
+    backgroundColor: COLORS.warning + '10',
+    borderRadius: 12,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.warning,
+  },
+  explanationHeader: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 8,
+    marginBottom: 8,
+  },
+  explanationTitle: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.warning,
+  },
+  explanationText: {
+    fontSize: 14,
+    color: COLORS.text,
+    lineHeight: 20,
+  },
+  quizFooter: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
+    paddingHorizontal: 20,
+    paddingVertical: 16,
+    backgroundColor: COLORS.white,
+    borderTopWidth: 1,
+    borderTopColor: COLORS.border,
+  },
+  quizNavButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  quizNavButtonDisabled: {
+    opacity: 0.5,
+  },
+  quizNavButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  quizNavButtonTextDisabled: {
+    color: COLORS.gray400,
+  },
+  quizSubmitButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.primary,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  quizSubmitButtonDisabled: {
+    backgroundColor: COLORS.gray300,
+  },
+  quizSubmitButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+  quizSubmitButtonTextDisabled: {
+    color: COLORS.gray400,
+  },
+
+  // Quiz Results
+  quizResultsContainer: {
+    flex: 1,
+  },
+  quizResultsContent: {
+    flex: 1,
+  },
+  quizResultsHeader: {
+    flexDirection: 'row',
+    justifyContent: 'flex-end',
+    paddingHorizontal: 20,
+    paddingTop: 16,
+  },
+  quizResultsBody: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    paddingHorizontal: 32,
+  },
+  scoreCircle: {
+    marginBottom: 32,
+  },
+  scoreGradient: {
+    width: 160,
+    height: 160,
+    borderRadius: 80,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  scorePercentage: {
+    fontSize: 48,
+    fontWeight: 'bold',
+    color: COLORS.white,
+  },
+  scoreLabel: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.9)',
+    marginTop: 4,
+  },
+  scoreTitle: {
+    fontSize: 24,
+    fontWeight: 'bold',
+    color: COLORS.white,
+    textAlign: 'center',
+    marginBottom: 12,
+  },
+  scoreDescription: {
+    fontSize: 16,
+    color: 'rgba(255,255,255,0.8)',
+    textAlign: 'center',
+    marginBottom: 48,
+  },
+  quizActions: {
+    flexDirection: 'row',
+    gap: 16,
+  },
+  reviewButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.white,
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    gap: 8,
+  },
+  reviewButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.primary,
+  },
+  retakeButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    paddingHorizontal: 24,
+    paddingVertical: 12,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: 'rgba(255,255,255,0.3)',
+    gap: 8,
+  },
+  retakeButtonText: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: COLORS.white,
+  },
+
+  // Modal Styles
   modalContainer: {
     flex: 1,
     backgroundColor: COLORS.background,
@@ -848,25 +1786,27 @@ const styles = StyleSheet.create({
     paddingVertical: 60,
   },
   emptyNotesText: {
-    fontSize: 18,
+    fontSize: 16,
     fontWeight: '600',
-    color: COLORS.text,
-    marginTop: 16,
+    color: COLORS.gray600,
+    marginTop: 12,
     marginBottom: 8,
   },
   emptyNotesSubtext: {
     fontSize: 14,
-    color: COLORS.textSecondary,
+    color: COLORS.gray400,
     textAlign: 'center',
+    lineHeight: 20,
   },
+
+  // Chapter Modal Styles
   chapterItem: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    paddingVertical: 16,
-    paddingHorizontal: 20,
     backgroundColor: COLORS.white,
     borderRadius: 12,
+    padding: 16,
     marginBottom: 8,
   },
   activeChapter: {
@@ -879,17 +1819,16 @@ const styles = StyleSheet.create({
   },
   chapterTitle: {
     fontSize: 16,
-    fontWeight: '500',
+    fontWeight: '600',
     color: COLORS.text,
     marginBottom: 4,
   },
   activeChapterTitle: {
     color: COLORS.primary,
-    fontWeight: '600',
   },
   chapterTime: {
-    fontSize: 12,
-    color: COLORS.textSecondary,
+    fontSize: 14,
+    color: COLORS.gray600,
   },
 });
 
